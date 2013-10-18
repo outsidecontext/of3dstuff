@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ofMain.h"
+#include "OscReceiver.h"
+#include "ofxTuio.h"
 
 class testApp : public ofBaseApp {
 public:
@@ -23,4 +25,14 @@ public:
     ofVboMesh vboMesh;
     ofLight light;
     ofMaterial material;
+    
+    ofVec3f rotation;
+    OscReceiver osc;
+    
+    // TUIO
+    void	tuioAdded(ofxTuioCursor & tuioCursor);
+	void	tuioRemoved(ofxTuioCursor & tuioCursor);
+	void	tuioUpdated(ofxTuioCursor & tuioCursor);
+
+    ofxTuioClient   tuioClient;
 };

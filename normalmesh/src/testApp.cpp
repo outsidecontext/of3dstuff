@@ -16,13 +16,32 @@ void testApp::setup() {
     light.setDiffuseColor(ofColor(255.f, 255.f, 255.f));
     light.setPosition(0, 0, 0);
     light.setOrientation( ofVec3f(0, 0, 0) );
+    
+    rotation.set(0,0,0);
+    //osc.setup();
+    
+    tuioClient.start(3333);
+    ofAddListener(tuioClient.cursorAdded,this,&testApp::tuioAdded);
+	ofAddListener(tuioClient.cursorRemoved,this,&testApp::tuioRemoved);
+	ofAddListener(tuioClient.cursorUpdated,this,&testApp::tuioUpdated);
 }
 
 
 void testApp::update() {
     
+    tuioClient.getMessage();
+    list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
+    list<ofxTuioCursor*>::iterator tit;
+    
+    
+    //osc.update();
+    //rotation.x = ofLerp(rotation.x, osc.acc.x*180, .01);
+    //rotation.y = ofLerp(rotation.y, osc.acc.y*180, .01);
+    //rotation.z = ofLerp(rotation.z, osc.acc.z*180, .01);
+    
     // update light pos based on mouse
     float y = ofMap(ofGetMouseX(), 0, ofGetWidth(), -90, 90);
+    //float y = ofMap(osc.slider, 0, 1, -90, 90);
     light.setOrientation( ofVec3f(0, y, 0) );
     
     // update z vertices using noise
@@ -32,6 +51,17 @@ void testApp::update() {
                           vertex.y*ofGetElapsedTimef()*0.0006,
                           vertex.x*ofGetElapsedTimef()*0.001,
                           vertex.z*ofGetElapsedTimef()*0.001) * 6;
+        if (true) {
+            z = 0;
+            for (tit=cursors.begin(); tit != cursors.end(); tit++) {
+                ofxTuioCursor *blob = (*tit);
+                float thresh = 2;
+                if (blob->getX()*100 >= vertex.x-thresh && blob->getX()*100 <= vertex.x+thresh
+                    && blob->getY()*100 >= vertex.y-thresh && blob->getY()*100 <= vertex.y+thresh) {
+                    z = 10;
+                }
+            }
+        }
         vertex.z = ofLerp(vertex.z, z, 0.1);
         mesh.setVertex(i, vertex);
     }
@@ -121,6 +151,12 @@ void testApp::draw() {
 	ofBackgroundGradient(ofColor(30), ofColor(0));
     
 	cam.begin();
+    
+    ofPushMatrix();
+    ofRotateX(rotation.x);
+    ofRotateY(rotation.y);
+    ofRotateZ(rotation.z);
+    
 	ofEnableDepthTest();
     //material.begin();
     ofEnableLighting();
@@ -152,7 +188,10 @@ void testApp::draw() {
     ofDisableLighting();
 	ofDisableDepthTest();
     //material.end();
+    ofPopMatrix();
 	cam.end();
+    
+    tuioClient.drawCursors();
 	
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
@@ -202,4 +241,19 @@ void testApp::gotMessage(ofMessage msg){
 
 void testApp::dragEvent(ofDragInfo dragInfo){ 
 	
+}
+
+void testApp::tuioAdded(ofxTuioCursor &tuioCursor){
+	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+	//cout << "Point n" << tuioCursor.getSessionId() << " add at " << loc << endl;
+}
+
+void testApp::tuioUpdated(ofxTuioCursor &tuioCursor){
+	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+	//cout << "Point n" << tuioCursor.getSessionId() << " updated at " << loc << endl;
+}
+
+void testApp::tuioRemoved(ofxTuioCursor &tuioCursor){
+	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+	//cout << "Point n" << tuioCursor.getSessionId() << " remove at " << loc << endl;
 }
