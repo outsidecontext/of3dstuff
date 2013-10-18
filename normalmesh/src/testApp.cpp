@@ -32,7 +32,7 @@ void testApp::update() {
     tuioClient.getMessage();
     list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
     list<ofxTuioCursor*>::iterator tit;
-    
+    float blobx, bloby;
     
     //osc.update();
     //rotation.x = ofLerp(rotation.x, osc.acc.x*180, .01);
@@ -55,10 +55,12 @@ void testApp::update() {
             z = 0;
             for (tit=cursors.begin(); tit != cursors.end(); tit++) {
                 ofxTuioCursor *blob = (*tit);
-                float thresh = 2;
-                if (blob->getX()*100 >= vertex.x-thresh && blob->getX()*100 <= vertex.x+thresh
-                    && blob->getY()*100 >= vertex.y-thresh && blob->getY()*100 <= vertex.y+thresh) {
-                    z = 10;
+                float thresh = 4;
+                blobx = ofMap(blob->getX(), 0, 1, -50, 50);
+                bloby = ofMap(blob->getY(), 0, 1, 50, -50);
+                if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
+                    && bloby >= vertex.y-thresh && bloby <= vertex.y+thresh) {
+                    z = 6;
                 }
             }
         }
