@@ -25,6 +25,7 @@ public:
     ofVboMesh vboMesh;
     ofLight light;
     ofMaterial material;
+    bool smoothLighting;
     
     ofVec3f rotation;
     OscReceiver osc;

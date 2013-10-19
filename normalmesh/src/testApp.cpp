@@ -10,7 +10,8 @@ void testApp::setup() {
     material.setShininess(120);
     material.setSpecularColor(ofColor(255, 255, 255, 255));
     // lights
-    ofSetSmoothLighting(true);
+    smoothLighting = true;
+    ofSetSmoothLighting(smoothLighting);
     light.setDirectional();
     light.setAmbientColor(ofColor(55.f, 55.f, 55.f));
     light.setDiffuseColor(ofColor(255.f, 255.f, 255.f));
@@ -29,10 +30,11 @@ void testApp::setup() {
 
 void testApp::update() {
     
-    tuioClient.getMessage();
+    bool useTuioTouch = false;
+    float blobx, bloby;
+    if (useTuioTouch) tuioClient.getMessage();
     list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
     list<ofxTuioCursor*>::iterator tit;
-    float blobx, bloby;
     
     //osc.update();
     //rotation.x = ofLerp(rotation.x, osc.acc.x*180, .01);
@@ -48,19 +50,18 @@ void testApp::update() {
 	for (int i=0; i<mesh.getNumVertices(); i++) {
         ofVec3f vertex = mesh.getVertex(i);
         float z = ofNoise(
-                          vertex.y*ofGetElapsedTimef()*0.0006,
-                          vertex.x*ofGetElapsedTimef()*0.001,
-                          vertex.z*ofGetElapsedTimef()*0.001) * 6;
-        if (true) {
-            z = 0;
+            vertex.x*ofGetElapsedTimef()*0.001,
+            vertex.y*ofGetElapsedTimef()*0.00000001
+        ) * 6;
+        if (useTuioTouch) {
             for (tit=cursors.begin(); tit != cursors.end(); tit++) {
                 ofxTuioCursor *blob = (*tit);
-                float thresh = 4;
+                float thresh = 6;
                 blobx = ofMap(blob->getX(), 0, 1, -50, 50);
                 bloby = ofMap(blob->getY(), 0, 1, 50, -50);
                 if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
                     && bloby >= vertex.y-thresh && bloby <= vertex.y+thresh) {
-                    z = 6;
+                    z = 10;
                 }
             }
         }
@@ -81,8 +82,8 @@ void testApp::update() {
         ofVec3f v0 = mesh.getVertex(mesh.getIndex(j));
         ofVec3f v1 = mesh.getVertex(mesh.getIndex(j+1));
         ofVec3f v2 = mesh.getVertex(mesh.getIndex(j+2));
-        //ofVec3f v3 = mesh.getVertex(mesh.getIndex(j+3));
         ofVec3f U,V;
+        // This
         if (j%2==0) {
             //normal = -normal;
             U = (v1-v0);
@@ -91,60 +92,34 @@ void testApp::update() {
             U = (v0-v2);
             V = (v0-v1);
         }
+        // Or this?
+        U = (v2-v0);
+        V = (v1-v0);
+        
         ofVec3f normal = U.cross(V);
+        
+        if (j%2==0) normal *= -1;
+        
         // Store the face's normal for each of the vertices that make up the face.
         normal_buffer[mesh.getIndex(j+0)].push_back( normal );
-        normal_buffer[mesh.getIndex(j+1)].push_back( normal );
-        normal_buffer[mesh.getIndex(j+2)].push_back( normal );
+        if (ofGetKeyPressed('c')) {
+            normal_buffer[mesh.getIndex(j+1)].push_back( normal );
+            normal_buffer[mesh.getIndex(j+2)].push_back( normal );
+        }
+        
     }
     // loop over all normals for each vertex
     for( int i = 0; i < mesh.getNumVertices(); i++ ){
-        ofVec3f normal(0,0,1);
+        ofVec3f normal;
         for( int j = 0; j < normal_buffer[i].size(); j++ )
             normal += normal_buffer[i][j];
-        //normal /= normal_buffer[i].size();
+        normal /= normal_buffer[i].size();
         normal.normalize();
         mesh.addNormal(normal);
     }
     
+    delete [] normal_buffer;
     
-    // type 2 based on triangle strip
-    // http://www.gamedev.net/topic/301676-triangle-strip-normals/
-//    mesh.clearNormals();
-//    vector<ofVec3f>* normal_buffer = new vector<ofVec3f>[mesh.getNumVertices()];
-//    for (int j=0; j<mesh.getNumIndices()-3; j+=4) {
-//        ofVec3f a = mesh.getVertex(mesh.getIndex(j));
-//        ofVec3f b = mesh.getVertex(mesh.getIndex(j+1));
-//        ofVec3f c = mesh.getVertex(mesh.getIndex(j+2));
-//        ofVec3f d = mesh.getVertex(mesh.getIndex(j+3));
-//        
-//        ofVec3f v1,v2,v3;
-//        ofVec3f n1,n2;
-//        
-//        v1=(c-a);
-//        v2=(d-a);
-//        v3=(b-a);
-//        
-//        n1 = v1.getCrossed(v2);
-//        n2 = v2.getCrossed(v3);
-//        
-//        ofVec3f normal=(n1+n2)/2;
-//        normal.normalize();
-//        
-//        // Store the face's normal for each of the vertices that make up the face.
-//        normal_buffer[mesh.getIndex(j+0)].push_back( normal );
-//        normal_buffer[mesh.getIndex(j+1)].push_back( normal );
-//        normal_buffer[mesh.getIndex(j+2)].push_back( normal );
-//        normal_buffer[mesh.getIndex(j+3)].push_back( normal );
-//    }
-//    for( int i = 0; i < mesh.getNumVertices(); ++i ){
-//        ofVec3f normal(0,0,0);
-//        for( int j = 0; j < normal_buffer[i].size(); ++j )
-//            normal += normal_buffer[i][j];
-//        normal /= normal_buffer[i].size();
-//        normal.normalize();
-//        mesh.addNormal(normal);
-//    }
     
 }
 
@@ -203,6 +178,10 @@ void testApp::keyPressed(int key){
 	if(key == 'f') {
 		ofToggleFullscreen();
 	}
+    else if (key == 's'){
+        smoothLighting = !smoothLighting; 
+        ofSetSmoothLighting(smoothLighting);
+    }
 }
 
 
