@@ -1,14 +1,17 @@
 #include "testApp.h"
 
 void testApp::setup() {
+    
     // generate a plane mesh
 	int res = 50;    
     ofPlanePrimitive plane(100, 100, res, res);
     mesh = plane.getMesh();
     mesh.setColorForIndices(0, mesh.getNumIndices(), ofColor(30,50,160));
+    
     // material
     material.setShininess(120);
     material.setSpecularColor(ofColor(255, 255, 255, 255));
+    
     // lights
     smoothLighting = true;
     ofSetSmoothLighting(smoothLighting);
@@ -18,6 +21,13 @@ void testApp::setup() {
     light.setPosition(0, 0, 0);
     light.setOrientation( ofVec3f(0, 0, 0) );
     
+    // shader and FBO
+    bokehShader.load("shaders/bokeh.vert", "shaders/bokeh.frag");
+    setupFbo();
+    
+    bias = 30.0;
+    focus = .8;
+    
     rotation.set(0,0,0);
     //osc.setup();
     
@@ -25,6 +35,18 @@ void testApp::setup() {
     ofAddListener(tuioClient.cursorAdded,this,&testApp::tuioAdded);
 	ofAddListener(tuioClient.cursorRemoved,this,&testApp::tuioRemoved);
 	ofAddListener(tuioClient.cursorUpdated,this,&testApp::tuioUpdated);
+}
+
+void testApp::setupFbo(){
+    ofFbo::Settings s;
+    s.width = ofNextPow2(ofGetWidth());
+    s.height = ofNextPow2(ofGetHeight());
+    //s.textureTarget = GL_TEXTURE_2D;
+    s.useDepth = true;
+    s.depthStencilInternalFormat = GL_DEPTH_COMPONENT24;
+    s.depthStencilAsTexture = true;
+    s.numSamples = 4;
+    fbo.allocate(s);
 }
 
 
@@ -44,7 +66,7 @@ void testApp::update() {
     // update light pos based on mouse
     float y = ofMap(ofGetMouseX(), 0, ofGetWidth(), -90, 90);
     //float y = ofMap(osc.slider, 0, 1, -90, 90);
-    light.setOrientation( ofVec3f(0, y, 0) );
+    if (ofGetKeyPressed('g')) light.setOrientation( ofVec3f(0, y, 0) );
     
     // update z vertices using noise
 	for (int i=0; i<mesh.getNumVertices(); i++) {
@@ -56,7 +78,7 @@ void testApp::update() {
         if (useTuioTouch) {
             for (tit=cursors.begin(); tit != cursors.end(); tit++) {
                 ofxTuioCursor *blob = (*tit);
-                float thresh = 6;
+                float thresh = 4;
                 blobx = ofMap(blob->getX(), 0, 1, -50, 50);
                 bloby = ofMap(blob->getY(), 0, 1, 50, -50);
                 if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
@@ -127,8 +149,10 @@ void testApp::update() {
 void testApp::draw() {
 	ofBackgroundGradient(ofColor(30), ofColor(0));
     
-	cam.begin();
+    fbo.begin();
+    ofClear(0);
     
+	cam.begin();
     ofPushMatrix();
     ofRotateX(rotation.x);
     ofRotateY(rotation.y);
@@ -168,19 +192,78 @@ void testApp::draw() {
     ofPopMatrix();
 	cam.end();
     
-    tuioClient.drawCursors();
+    fbo.end();
+    
+    // draw the bokeh shader
+    drawShader();
+    
+    if(ofGetKeyPressed('d')){
+        fbo.getTextureReference().draw(10, 10, 300, 300);
+        fbo.getDepthTexture().draw(320, 10, 300, 300);
+        ofSetColor(255, 0, 0);
+        ofDrawBitmapString("bias: " + ofToString(bias), 20, 20);
+        ofDrawBitmapString("focus: " + ofToString(focus), 20, 40);
+        ofSetColor(255);
+        tuioClient.drawCursors();
+    }
 	
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
 
+void testApp::drawShader(){
+    bokehShader.begin();
+	glActiveTexture(GL_TEXTURE0);
+    fbo.getTextureReference().bind();
+	glActiveTexture(GL_TEXTURE1);
+    fbo.getDepthTexture().bind();
+    bokehShader.setUniform1i("tex0", 0);
+    bokehShader.setUniform1i("tex1", 1);
+    bokehShader.setUniform1f("blurclamp", 100.0f);
+    bokehShader.setUniform1f("bias", bias);
+    bokehShader.setUniform1f("focus", focus);
+    float w = fbo.getWidth();
+    float h = fbo.getHeight();
+	// draw full screen quad 
+	glBegin(GL_QUADS);  
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, h);
+	glVertex3f(0, h, 0);  
+	glMultiTexCoord2f(GL_TEXTURE0, 0.0f, 0.0f);
+	glVertex3f(0, 0, 0);  
+	glMultiTexCoord2f(GL_TEXTURE0, w, 0.0f);
+	glVertex3f(w, 0, 0);  
+	glMultiTexCoord2f(GL_TEXTURE0, w, h);
+	glVertex3f(w, h, 0);  
+	glEnd();
+    fbo.getDepthTexture().bind();
+	glActiveTexture(GL_TEXTURE0);
+    fbo.getTextureReference().unbind();
+	bokehShader.end();
+}
+
 
 void testApp::keyPressed(int key){
-	if(key == 'f') {
-		ofToggleFullscreen();
-	}
-    else if (key == 's'){
-        smoothLighting = !smoothLighting; 
-        ofSetSmoothLighting(smoothLighting);
+    switch (key) {
+        case 'f':
+            ofToggleFullscreen();
+            break;
+        case 's':
+            smoothLighting = !smoothLighting; 
+            ofSetSmoothLighting(smoothLighting);
+            break;
+        case 'P':
+            bias += 10;
+            break;
+        case 'p':
+            bias -= 10;
+            break;
+        case 'L':
+            focus += .01;
+            break;
+        case 'l':
+            focus -= .01;
+            break;
+        default:
+            break;
     }
 }
 
@@ -211,7 +294,7 @@ void testApp::mouseReleased(int x, int y, int button){
 
 
 void testApp::windowResized(int w, int h){
-	
+	setupFbo();
 }
 
 

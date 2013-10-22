@@ -7,8 +7,10 @@
 class testApp : public ofBaseApp {
 public:
     void setup();
+    void setupFbo();
     void update();
     void draw();
+    void drawShader();
     
     void keyPressed(int key);
     void keyReleased(int key);
@@ -19,6 +21,10 @@ public:
     void windowResized(int w, int h);
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
+    
+    ofFbo fbo;
+    ofShader bokehShader;
+    float bias, focus;
     
     ofEasyCam cam;
     ofMesh mesh;
