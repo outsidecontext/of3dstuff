@@ -3,7 +3,7 @@
 void testApp::setup() {
     
     // generate a plane mesh
-	int res = 50;    
+	int res = 50;
     ofPlanePrimitive plane(100, 100, res, res);
     mesh = plane.getMesh();
     mesh.setColorForIndices(0, mesh.getNumIndices(), ofColor(30,50,160));
@@ -52,7 +52,7 @@ void testApp::setupFbo(){
 
 void testApp::update() {
     
-    bool useTuioTouch = false;
+    bool useTuioTouch = true;
     float blobx, bloby;
     if (useTuioTouch) tuioClient.getMessage();
     list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
@@ -72,22 +72,27 @@ void testApp::update() {
 	for (int i=0; i<mesh.getNumVertices(); i++) {
         ofVec3f vertex = mesh.getVertex(i);
         float z = ofNoise(
-            vertex.x*ofGetElapsedTimef()*0.001,
-            vertex.y*ofGetElapsedTimef()*0.00000001
+            vertex.x*ofGetElapsedTimef()*0.01,
+            vertex.y*ofGetElapsedTimef()*0.01,
+            vertex.z*0.01
         ) * 6;
         if (useTuioTouch) {
             for (tit=cursors.begin(); tit != cursors.end(); tit++) {
                 ofxTuioCursor *blob = (*tit);
-                float thresh = 4;
+                float thresh = 3;
                 blobx = ofMap(blob->getX(), 0, 1, -50, 50);
                 bloby = ofMap(blob->getY(), 0, 1, 50, -50);
                 if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
                     && bloby >= vertex.y-thresh && bloby <= vertex.y+thresh) {
-                    z = 10;
+                    z = 6;
                 }
             }
         }
         vertex.z = ofLerp(vertex.z, z, 0.1);
+        
+        //float r = ofMap(x, <#float inputMin#>, <#float inputMax#>, <#float outputMin#>, <#float outputMax#>)
+        ofFloatColor colour = ofFloatColor(vertex.x/100.0, vertex.y/100.0, z/6);
+        mesh.setColor(i, colour);
         mesh.setVertex(i, vertex);
     }
     
@@ -154,9 +159,9 @@ void testApp::draw() {
     
 	cam.begin();
     ofPushMatrix();
-    ofRotateX(rotation.x);
-    ofRotateY(rotation.y);
-    ofRotateZ(rotation.z);
+    //ofRotateX(rotation.x);
+    //ofRotateY(rotation.y);
+    //ofRotateZ(rotation.z);
     
 	ofEnableDepthTest();
     //material.begin();
