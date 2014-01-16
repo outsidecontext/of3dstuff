@@ -15,9 +15,9 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-               BuildableName = "normalmesh.app"
-               BlueprintName = "normalmesh"
-               ReferencedContainer = "container:normalmesh.xcodeproj">
+               BuildableName = "depthshader.app"
+               BlueprintName = "depthshader"
+               ReferencedContainer = "container:depthshader.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -33,9 +33,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "normalmesh.app"
-            BlueprintName = "normalmesh"
-            ReferencedContainer = "container:normalmesh.xcodeproj">
+            BuildableName = "depthshader.app"
+            BlueprintName = "depthshader"
+            ReferencedContainer = "container:depthshader.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
    </TestAction>
@@ -52,9 +52,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "normalmesh.app"
-            BlueprintName = "normalmesh"
-            ReferencedContainer = "container:normalmesh.xcodeproj">
+            BuildableName = "depthshader.app"
+            BlueprintName = "depthshader"
+            ReferencedContainer = "container:depthshader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
       <AdditionalOptions>
@@ -70,9 +70,9 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "E4B69B5A0A3A1756003C02F2"
-            BuildableName = "normalmesh.app"
-            BlueprintName = "normalmesh"
-            ReferencedContainer = "container:normalmesh.xcodeproj">
+            BuildableName = "depthshader.app"
+            BlueprintName = "depthshader"
+            ReferencedContainer = "container:depthshader.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>
