@@ -1,9 +1,6 @@
 #pragma once
 
 #include "ofMain.h"
-#include "ofxBumpShader.h"
-// include GUI to control
-// some params (OF8.0)
 #include "ofxGui.h"
 
 class testApp : public ofBaseApp{
@@ -13,6 +10,7 @@ public:
     void update();
     void draw();
     
+    void drawScene();
     void enableLights();
     void keyPressed(int key);
     void keyReleased(int key);
@@ -24,33 +22,18 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
-    //
-    //------------------------------------------------------
-    //
     
-    ofxBumpShader texture;
+    ofFbo fbo;
     ofEasyCam cam;
-    ofPlanePrimitive plane;
     ofSpherePrimitive sphere;
     ofShader bumpShader;
-    ofShader normalShader;
     ofImage colormap, bumpmap;
-    ofLight pointLight;
     
-    
-
-    // GUI params
-    // if GUI is not included
-    // use basic ints & floats (< OF8.0)
     ofxPanel gui;
     ofxFloatSlider lightX;
     ofxFloatSlider lightY;
     ofxFloatSlider lightZ;
     ofxFloatSlider lightShininess;
     ofxFloatSlider bumpScale;
-    // float lightX;
-    // float lightY;
-    // float lightZ;
-    // float lightShininess;
         
 };

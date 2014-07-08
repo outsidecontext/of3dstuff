@@ -24,7 +24,6 @@
 		60012C723B05938A3D388335 /* ofxUIValuePlotter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4D902D60E5CCFA9F2554BC7C /* ofxUIValuePlotter.cpp */; };
 		63B57AC5BF4EF088491E0317 /* ofxXmlSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 50DF87D612C5AAE17AAFA6C0 /* ofxXmlSettings.cpp */; };
 		7252706DA14C1BE63950ADDA /* ofxUIFPS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FEB61645EF9120F5BACB7462 /* ofxUIFPS.cpp */; };
-		735867B9196C3B0400C42478 /* ofxBumpShader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 735867B7196C3B0400C42478 /* ofxBumpShader.cpp */; };
 		735867CC196C3B2A00C42478 /* ofxBaseGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 735867BB196C3B2A00C42478 /* ofxBaseGui.cpp */; };
 		735867CD196C3B2A00C42478 /* ofxButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 735867BD196C3B2A00C42478 /* ofxButton.cpp */; };
 		735867CE196C3B2A00C42478 /* ofxGuiGroup.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 735867C0196C3B2A00C42478 /* ofxGuiGroup.cpp */; };
@@ -165,8 +164,6 @@
 		653CFAE31336DAA04B1F1503 /* ofxUI2DGraph.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxUI2DGraph.h; path = ../../../addons/ofxUI/src/ofxUI2DGraph.h; sourceTree = SOURCE_ROOT; };
 		664D65407BE633C038FA9498 /* ofxUIFPSSlider.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; fileEncoding = 30; name = ofxUIFPSSlider.h; path = ../../../addons/ofxUI/src/ofxUIFPSSlider.h; sourceTree = SOURCE_ROOT; };
 		702A2528CA64B397E9B91ABE /* ofxUIToggleMatrix.cpp */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = ofxUIToggleMatrix.cpp; path = ../../../addons/ofxUI/src/ofxUIToggleMatrix.cpp; sourceTree = SOURCE_ROOT; };
-		735867B7196C3B0400C42478 /* ofxBumpShader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBumpShader.cpp; sourceTree = "<group>"; };
-		735867B8196C3B0400C42478 /* ofxBumpShader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBumpShader.h; sourceTree = "<group>"; };
 		735867BB196C3B2A00C42478 /* ofxBaseGui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxBaseGui.cpp; sourceTree = "<group>"; };
 		735867BC196C3B2A00C42478 /* ofxBaseGui.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxBaseGui.h; sourceTree = "<group>"; };
 		735867BD196C3B2A00C42478 /* ofxButton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ofxButton.cpp; sourceTree = "<group>"; };
@@ -319,16 +316,6 @@
 			name = src;
 			sourceTree = "<group>";
 		};
-		735867B6196C3B0400C42478 /* bump */ = {
-			isa = PBXGroup;
-			children = (
-				735867B7196C3B0400C42478 /* ofxBumpShader.cpp */,
-				735867B8196C3B0400C42478 /* ofxBumpShader.h */,
-			);
-			name = bump;
-			path = ../../../addons/ofxBumpShader/src;
-			sourceTree = "<group>";
-		};
 		735867BA196C3B2A00C42478 /* gui */ = {
 			isa = PBXGroup;
 			children = (
@@ -366,7 +353,6 @@
 			isa = PBXGroup;
 			children = (
 				735867BA196C3B2A00C42478 /* gui */,
-				735867B6196C3B0400C42478 /* bump */,
 				1F4FB5C423662B96ADFDCC0B /* ofxXmlSettings */,
 				A492CE86424AB8905550BFD8 /* ofxUI */,
 			);
@@ -665,7 +651,6 @@
 				7F2CD93F681F3C1547B3BF2C /* ofxUIImageButton.cpp in Sources */,
 				FBD0CD0AFE3849C14E829CAF /* ofxUIImageSampler.cpp in Sources */,
 				26874B150C8535AEA0F24C8C /* ofxUIImageSlider.cpp in Sources */,
-				735867B9196C3B0400C42478 /* ofxBumpShader.cpp in Sources */,
 				FB8AA9FA6535767BE31806BC /* ofxUIImageToggle.cpp in Sources */,
 				735867CC196C3B2A00C42478 /* ofxBaseGui.cpp in Sources */,
 				7C3DC84C9BFCBD2866DB2B6C /* ofxUILabel.cpp in Sources */,
