@@ -15,15 +15,11 @@ void testApp::setup() {
     
     fbo.allocate(ofGetWidth(), ofGetHeight());
     
-    //ofVboMesh mesh = ofVboMesh::plane(ofGetWidth(), ofGetHeight());
-    //mesh.draw();
-    
     mesh.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
     int w = (int) fbo.getWidth();
 	int h = (int) fbo.getHeight();
 	int step = 4;
 	for(int y = 0; y < h; y += step) {
-		//glBegin(GL_TRIANGLE_STRIP);
 		for(int x = 0; x < w; x += step) {
 			ofPoint texCoords;
 			texCoords = fbo.getTextureReference().getCoordFromPoint(x, y);
@@ -33,7 +29,6 @@ void testApp::setup() {
             mesh.addTexCoord(texCoords);
             mesh.addVertex(ofVec3f(x, y+step, 0));
 		}
-		//glEnd();
 	}
     
 	
@@ -84,14 +79,31 @@ void testApp::update() {
 	}
     
     fbo.begin();
-    videoGrabber.draw(0, 0, fbo.getWidth(), fbo.getHeight());
-    //img.draw(0, 0, fbo.getWidth(), fbo.getHeight());
+    //videoGrabber.draw(0, 0, fbo.getWidth(), fbo.getHeight());
+    img.draw(0, 0, fbo.getWidth(), fbo.getHeight());
     fbo.end();
+    
+    ofSetWindowTitle(ofToString(ofGetFrameRate()));
 }
 
 //--------------------------------------------------------------
 void testApp::draw() {
-	drawWithShader();
+	
+    drawWithShader();
+    
+//    ofSetColor(60);
+//    ofPlanePrimitive plane = ofPlanePrimitive(ofGetWidth(), ofGetHeight(), 100, 100);
+//    ofPushMatrix();
+//    ofTranslate(ofGetWidth()*.5, ofGetHeight()*.5);
+//    if (ofGetKeyPressed('r')) {
+//        rotX = ofLerp(mouseX, rotX, rotSmooth);
+//        rotY = ofLerp(mouseY, rotY, rotSmooth);
+//    }
+//    glRotatef(rotX, 0, 1, 0);
+//    glRotatef(-rotY, 1, 0, 0);
+//    plane.drawWireframe();
+//    ofPopMatrix();
+    
 	//ofSetColor(0);
 	//ofRect(5, 5, 290, 45);
 	//ofSetColor(255);
@@ -117,6 +129,9 @@ void testApp::drawWithShader(){
     glRotatef(-rotY, 1, 0, 0);
     glTranslatef(-w / 2, -h / 2, -0);
 	
+    
+    
+    
 	// Start shader and bind textures
 	shader.begin();
 	glActiveTexture(GL_TEXTURE0);
@@ -124,9 +139,13 @@ void testApp::drawWithShader(){
 	
 	// Set shader params
 	shader.setUniform1i("tex0", int(GLuint(0)));
+    
     float scale = ofMap(ofGetMouseX(), 0, ofGetWidth(), 1, 500);
-    ofSetWindowTitle(ofToString(scale));
+    // force scale
+//    scale = 1;
+    
     shader.setUniform1f("scale", scale);
+    
 	// draw mesh
     if (ofGetKeyPressed('p')) {
         mesh.drawVertices();
@@ -135,6 +154,8 @@ void testApp::drawWithShader(){
     } else {
         mesh.draw();
     }
+    
+//    mesh.drawWireframe();
     
 	// end shader
 	shader.end();
