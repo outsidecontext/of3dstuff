@@ -48,6 +48,7 @@ void testApp::drawScene() {
     enableLights();
     colormap.getTextureReference().bind();
     sphere.draw();
+    if (ofGetKeyPressed('n')) sphere.drawNormals(2);
     colormap.getTextureReference().unbind();
     glDisable(GL_LIGHTING);
     cam.end();
@@ -78,20 +79,14 @@ void testApp::enableLights(){
     
     // light params
     GLfloat position[]   = { lightX, lightY, lightZ, 1 };
-    GLfloat ambient[]    = { .05, .05, .05, 1 };
-    GLfloat diffuse[]    = { 1., .1, .1, .5 };
-    GLfloat specular[]   = { .1, 1, .1, 1 };
-    GLfloat reflection[] = { 0.1, 0.1, 0.1, 1.0 };
-    GLfloat material[]   = { 1.0, 1.0, 1.0, 1.0 };
-    
     GLfloat no_mat[]			= { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat mat_ambient[]		= { 0.2, 0.2, 0.2, 1.0 };
-    GLfloat mat_diffuse[]		= { 0.3, 0.3, 0.3, 1.0 };
+    GLfloat mat_ambient[]		= { 0.6, 0.3, 0.4, 1.0 };
+    GLfloat mat_diffuse[]		= { 0.3, 0.5, 0.8, 1.0 };
     GLfloat mat_specular[]		= { 1.0, 1.0, 1.0, 1.0 };
     GLfloat mat_emission[]		= { 0.4, 0.7, 1.0, 0.0 };
     
     // light components
-    glLightfv(GL_LIGHT0, GL_AMBIENT, no_mat);
+    //glLightfv(GL_LIGHT0, GL_AMBIENT, no_mat);
     //glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse);
     //glLightfv(GL_LIGHT0, GL_SPECULAR, specular);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
@@ -100,11 +95,11 @@ void testApp::enableLights(){
 	//glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.00015f );
     
     // material components
-    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, no_mat);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
     glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, mat_diffuse);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, reflection);
+    glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
     glMateriali(GL_FRONT_AND_BACK, GL_SHININESS, lightShininess);
-    glMaterialfv( GL_FRONT_AND_BACK, GL_EMISSION, no_mat );
+    glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, no_mat );
     
 }
 

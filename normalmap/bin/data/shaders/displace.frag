@@ -53,8 +53,8 @@ void PointLight(in int i,
  }
 
 void main(void) {
-	//vec4 color = ambientGlobal;
-	vec4 color = texture2D(colormap, TexCoord);
+	vec4 color = ambientGlobal;
+	//vec4 color = texture2D(colormap, TexCoord);
 	//color *= ambientGlobal;
 	vec3 eye = normalize( -ecPosition3 );
 	
@@ -81,10 +81,12 @@ void main(void) {
 	color += atten * gl_FrontMaterial.emission * ppFresnell * 1.0;
 	color += pow( atten, 3.0 ) * gl_FrontMaterial.emission;
 	
-	gl_FragColor.rgb = color.rgb;
-	gl_FragColor.a = 1.0;
+	//gl_FragColor.rgb = color.rgb;
+	//gl_FragColor.a = 1.0;
 
-    //gl_FragColor = texture2D(colormap, TexCoord);
+
+
+    gl_FragColor = texture2D(colormap, TexCoord) * color;
 
     //gl_FragColor = vec4(0.6, 0.0, 0.0, 1.0);
     //gl_FragColor = gl_Color;

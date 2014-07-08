@@ -21,6 +21,6 @@ void main(void) {
 	ecPosition3		= vec3( ecPosition ) / ecPosition.w;
 	normal			= gl_NormalMatrix * gl_Normal;
 	gl_Position		= gl_ModelViewProjectionMatrix * newVertexPos;
-	//ambientGlobal	= gl_LightModel.ambient * gl_FrontMaterial.ambient;
-	ambientGlobal	= gl_FrontMaterial.ambient;
+	ambientGlobal	= gl_LightModel.ambient * gl_FrontMaterial.ambient;
+	//ambientGlobal	= gl_FrontMaterial.ambient;
 }
