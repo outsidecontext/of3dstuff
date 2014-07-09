@@ -27,7 +27,7 @@ public:
     ofEasyCam cam;
     ofSpherePrimitive sphere;
     ofShader bumpShader;
-    ofImage colormap, bumpmap;
+    ofImage colormap, bumpmap, normalMap;
     
     ofxPanel gui;
     ofxFloatSlider lightX;
@@ -35,5 +35,10 @@ public:
     ofxFloatSlider lightZ;
     ofxFloatSlider lightShininess;
     ofxFloatSlider bumpScale;
-        
+    
+    ofxFloatColorSlider lightAmbient;
+    ofxFloatColorSlider lightDiffuse;
+    
+    ofxFloatColorSlider matAmbient;
+    ofxFloatColorSlider matDiffuse;
 };

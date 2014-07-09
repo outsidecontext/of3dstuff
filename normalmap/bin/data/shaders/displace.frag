@@ -1,5 +1,6 @@
 uniform sampler2D colormap;
 uniform sampler2D bumpmap;
+uniform sampler2D normalMap;
 varying vec2  TexCoord;
 
 uniform int NumEnabledLights;
@@ -54,8 +55,6 @@ void PointLight(in int i,
 
 void main(void) {
 	vec4 color = ambientGlobal;
-	//vec4 color = texture2D(colormap, TexCoord);
-	//color *= ambientGlobal;
 	vec3 eye = normalize( -ecPosition3 );
 	
 	// Clear the light intensity accumulators 
@@ -83,11 +82,5 @@ void main(void) {
 	
 	//gl_FragColor.rgb = color.rgb;
 	//gl_FragColor.a = 1.0;
-
-
-
     gl_FragColor = texture2D(colormap, TexCoord) * color;
-
-    //gl_FragColor = vec4(0.6, 0.0, 0.0, 1.0);
-    //gl_FragColor = gl_Color;
 }
