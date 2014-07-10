@@ -23,10 +23,11 @@ public:
     void gotMessage(ofMessage msg);
     
     
-    ofFbo fbo;
+    ofFbo fbo, noiseFbo;
     ofEasyCam cam;
     ofSpherePrimitive sphere;
     ofShader bumpShader;
+    ofShader noiseShader;
     ofImage colormap, bumpmap, normalMap, specularMap;
     
     ofxPanel gui;
@@ -38,7 +39,9 @@ public:
     
     ofxFloatColorSlider lightAmbient;
     ofxFloatColorSlider lightDiffuse;
-    
+    ofxFloatColorSlider lightSpecular;
     ofxFloatColorSlider matAmbient;
     ofxFloatColorSlider matDiffuse;
+    ofxFloatColorSlider matSpecular;
+    ofxFloatSlider attenuationLin, attenuationConst, attenuationQuad;
 };

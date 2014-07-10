@@ -11,6 +11,7 @@ void testApp::setup(){
     specularMap.loadImage(dir + "specular.png");
     //bumpShader.setGeometryOutputType(GL_TRIANGLE_STRIP); // type: GL_POINTS, GL_LINE_STRIP or GL_TRIANGLE_STRIP
     bumpShader.load("shaders/displace.vert", "shaders/displace.frag");
+    noiseShader.load("shaders/noise.vert", "shaders/noise.frag");
     
     gui.setup();
     gui.add(lightX.setup("light.x", 330, -3000, 3000));
@@ -23,10 +24,16 @@ void testApp::setup(){
     ofFloatColor max = ofFloatColor(1.0);
     gui.add(lightAmbient.setup("light ambient", ofFloatColor(0.5, 0.5, 0.5, 1.0), min, max));
     gui.add(lightDiffuse.setup("light diff", ofFloatColor(0.95, 0.95, 0.95, 1.0), min, max));
+    gui.add(lightSpecular.setup("light spec", ofFloatColor(1.0), min, max));
     gui.add(matAmbient.setup("mat ambient", ofFloatColor(0.3, 0.3, 0.3, 1.0), min, max));
     gui.add(matDiffuse.setup("mat diff", ofFloatColor(0.96, 0.96, 0.96, 1.0), min, max));
+    gui.add(matSpecular.setup("mat spec", ofFloatColor(1.0), min, max));
     
-    sphere.set(200, 200);
+    gui.add(attenuationLin.setup("attenuation lin", 0.15, 0.0, 1.0));
+    gui.add(attenuationConst.setup("attenuation const", 0.15, 0.0, 1.0));
+    gui.add(attenuationQuad.setup("attenuation quad", 0.15, 0.0, 1.0));
+    
+    sphere.set(200, 100);
     
     ofFbo::Settings s;
     s.width = ofNextPow2(ofGetWidth());
@@ -36,10 +43,31 @@ void testApp::setup(){
     //s.depthStencilInternalFormat = GL_DEPTH_COMPONENT24;
     s.depthStencilAsTexture = true;
     fbo.allocate(s);
+    
+    noiseFbo.allocate(bumpmap.getWidth()*0.5, bumpmap.getHeight()*0.5);
 }
 
 
 void testApp::update(){
+    noiseFbo.begin();
+    noiseShader.begin();
+    noiseShader.setUniform1f("time", ofGetElapsedTimef());
+    int n = 1;
+    int w = noiseFbo.getWidth();
+    int h = noiseFbo.getHeight();
+    glColor3f(1.0f, 1.0f, 1.0f); // White base color
+    glBegin(GL_TRIANGLE_STRIP);
+    glTexCoord2f(-n, -n);
+	glVertex2f(0, 0);
+	glTexCoord2f(-n, n);
+	glVertex2f(0, h);
+	glTexCoord2f(n, -n);
+	glVertex2f(w, 0);
+	glTexCoord2f(n, n);
+	glVertex2f(w, h);
+    glEnd();
+    noiseShader.end();
+    noiseFbo.end();
 }
 
 
@@ -53,9 +81,11 @@ void testApp::drawScene() {
     bumpShader.begin();
     bumpShader.setUniform1i( "NumEnabledLights", 1 );
     bumpShader.setUniformTexture("colormap", colormap, 1);
-    bumpShader.setUniformTexture("bumpmap", bumpmap, 2);
+    if (ofGetKeyPressed('w')) bumpShader.setUniformTexture("bumpmap", noiseFbo.getTextureReference(), 2);
+    else bumpShader.setUniformTexture("bumpmap", bumpmap, 2);
     bumpShader.setUniformTexture("normalMap", normalMap, 3);
-    bumpShader.setUniformTexture("glossMap", specularMap, 4);
+    if (ofGetKeyPressed('s')) bumpShader.setUniformTexture("glossMap", noiseFbo.getTextureReference(), 4);
+    else bumpShader.setUniformTexture("glossMap", specularMap, 4);
     bumpShader.setUniform1i("maxHeight", bumpScale);
     sphere.draw();
     // This will show the ofSphere normals BEFORE they're recalculated on the GPU
@@ -81,6 +111,7 @@ void testApp::draw(){
     fbo.end();
     fbo.getDepthTexture().draw(0, 0, 100, 100);*/
     drawScene();
+    //noiseFbo.draw(0,0);
     gui.draw();
 }
 
@@ -97,24 +128,28 @@ void testApp::enableLights(){
     GLfloat light_ambient[] = { l.r, l.g, l.b, l.a };
     l = lightDiffuse;
     GLfloat light_diffuse[] = { l.r, l.g, l.b, l.a };
+    l = lightSpecular;
+    GLfloat light_specular[] = { l.r, l.g, l.b, l.a };
     
     // material settings, some are GUI controlled
     GLfloat no_mat[] = { 0.0, 0.0, 0.0, 1.0 };
-    GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
-    GLfloat mat_emission[] = { 0.4, 0.7, 1.0, 0.0 };
+    //GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
     l = matAmbient;
     GLfloat mat_ambient[] = { l.r, l.g, l.b, l.a };
     l = matDiffuse;
     GLfloat mat_diffuse[] = { l.r, l.g, l.b, l.a };
+    l = matSpecular;
+    GLfloat mat_specular[] = { l.r, l.g, l.b, l.a };
+    
     
     // light components
     glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
     glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    //glLightfv(GL_LIGHT0, GL_SPECULAR, mat_specular);
+    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
     glLightfv(GL_LIGHT0, GL_POSITION, position);
-    //glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, 0.0f );
-	//glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, 0.0f );
-	//glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, 0.00015f );
+    glLightf( GL_LIGHT0, GL_CONSTANT_ATTENUATION, attenuationConst * 0.0001);
+	glLightf( GL_LIGHT0, GL_LINEAR_ATTENUATION, attenuationLin * 0.0001);
+	glLightf( GL_LIGHT0, GL_QUADRATIC_ATTENUATION, attenuationQuad * 0.0001);
     
     // material components
     glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, mat_ambient);
