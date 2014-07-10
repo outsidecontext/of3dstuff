@@ -4,16 +4,18 @@
 void testApp::setup(){
     ofDisableArbTex();
     
-    colormap.loadImage("images/earth-texture.jpg");
-    bumpmap.loadImage("images/earth-bump.jpg");
-    normalMap.loadImage("images/earth-normal.jpg");
+    string dir = "images/earth-high/";
+    colormap.loadImage(dir + "texture.png");
+    bumpmap.loadImage(dir + "bump.jpg");
+    normalMap.loadImage(dir + "normal.png");
+    specularMap.loadImage(dir + "specular.png");
     //bumpShader.setGeometryOutputType(GL_TRIANGLE_STRIP); // type: GL_POINTS, GL_LINE_STRIP or GL_TRIANGLE_STRIP
     bumpShader.load("shaders/displace.vert", "shaders/displace.frag");
     
     gui.setup();
-    gui.add(lightX.setup("light.x", 200, -3000, 3000));
-    gui.add(lightY.setup("light.y", 400, -3000, 3000));
-    gui.add(lightZ.setup("light.z", 100, -3000, 3000));
+    gui.add(lightX.setup("light.x", 330, -3000, 3000));
+    gui.add(lightY.setup("light.y", 300, -3000, 3000));
+    gui.add(lightZ.setup("light.z", -90, -3000, 3000));
     gui.add(lightShininess.setup("light.shininess", 64, 0, 128));
     gui.add(bumpScale.setup("bump", 1, 0, 60));
     // light controls, set some default light/material colours
@@ -53,6 +55,7 @@ void testApp::drawScene() {
     bumpShader.setUniformTexture("colormap", colormap, 1);
     bumpShader.setUniformTexture("bumpmap", bumpmap, 2);
     bumpShader.setUniformTexture("normalMap", normalMap, 3);
+    bumpShader.setUniformTexture("glossMap", specularMap, 4);
     bumpShader.setUniform1i("maxHeight", bumpScale);
     sphere.draw();
     // This will show the ofSphere normals BEFORE they're recalculated on the GPU

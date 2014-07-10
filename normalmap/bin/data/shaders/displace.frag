@@ -1,6 +1,7 @@
 uniform sampler2D colormap;
 uniform sampler2D bumpmap;
 uniform sampler2D normalMap;
+uniform sampler2D glossMap;
 varying vec2  TexCoord;
 
 uniform int NumEnabledLights;
@@ -46,8 +47,10 @@ void PointLight(in int i,
     if (nDotVP == 0.0) 
         pf = 0.0; 
     else 
-        pf = pow( nDotVP, gl_FrontMaterial.shininess ); 
- 
+        pf = pow( nDotVP, gl_FrontMaterial.shininess );
+
+    
+
     ambient += gl_LightSource[0].ambient * attenuation; 
     diffuse += gl_LightSource[0].diffuse * nDotVP * attenuation;
 	specular += gl_LightSource[0].specular * pf * attenuation;
@@ -74,8 +77,10 @@ void main(void) {
 	
 	color += amb * gl_FrontMaterial.ambient + 
             diff * gl_FrontMaterial.diffuse; 
-			
-	color += spec * gl_FrontMaterial.specular;
+	
+	// specular map
+    vec4 specularMap = texture2D(glossMap, TexCoord);	
+	color += spec * gl_FrontMaterial.specular * specularMap.r;
 	
 	color += atten * gl_FrontMaterial.emission * ppFresnell * 1.0;
 	color += pow( atten, 3.0 ) * gl_FrontMaterial.emission;
