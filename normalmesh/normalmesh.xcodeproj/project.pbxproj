@@ -31,8 +31,6 @@
 		E811B48917FB6AF900C6135C /* IpEndpointName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B46317FB6AF900C6135C /* IpEndpointName.cpp */; };
 		E811B48A17FB6AF900C6135C /* NetworkingUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B46817FB6AF900C6135C /* NetworkingUtils.cpp */; };
 		E811B48B17FB6AF900C6135C /* UdpSocket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B46917FB6AF900C6135C /* UdpSocket.cpp */; };
-		E811B48C17FB6AF900C6135C /* NetworkingUtilsWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B46D17FB6AF900C6135C /* NetworkingUtilsWin.cpp */; };
-		E811B48D17FB6AF900C6135C /* UdpSocketWin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B46E17FB6AF900C6135C /* UdpSocketWin.cpp */; };
 		E811B48E17FB6AF900C6135C /* OscOutboundPacketStream.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B47317FB6AF900C6135C /* OscOutboundPacketStream.cpp */; };
 		E811B48F17FB6AF900C6135C /* OscPrintReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B47617FB6AF900C6135C /* OscPrintReceivedElements.cpp */; };
 		E811B49017FB6AF900C6135C /* OscReceivedElements.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E811B47817FB6AF900C6135C /* OscReceivedElements.cpp */; };
@@ -115,8 +113,6 @@
 		E811B46917FB6AF900C6135C /* UdpSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UdpSocket.cpp; sourceTree = "<group>"; };
 		E811B46A17FB6AF900C6135C /* TimerListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimerListener.h; sourceTree = "<group>"; };
 		E811B46B17FB6AF900C6135C /* UdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UdpSocket.h; sourceTree = "<group>"; };
-		E811B46D17FB6AF900C6135C /* NetworkingUtilsWin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkingUtilsWin.cpp; sourceTree = "<group>"; };
-		E811B46E17FB6AF900C6135C /* UdpSocketWin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UdpSocketWin.cpp; sourceTree = "<group>"; };
 		E811B47017FB6AF900C6135C /* MessageMappingOscPacketListener.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageMappingOscPacketListener.h; sourceTree = "<group>"; };
 		E811B47117FB6AF900C6135C /* OscException.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscException.h; sourceTree = "<group>"; };
 		E811B47217FB6AF900C6135C /* OscHostEndianness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OscHostEndianness.h; sourceTree = "<group>"; };
@@ -328,7 +324,6 @@
 				E811B46717FB6AF900C6135C /* posix */,
 				E811B46A17FB6AF900C6135C /* TimerListener.h */,
 				E811B46B17FB6AF900C6135C /* UdpSocket.h */,
-				E811B46C17FB6AF900C6135C /* win32 */,
 			);
 			path = ip;
 			sourceTree = "<group>";
@@ -340,15 +335,6 @@
 				E811B46917FB6AF900C6135C /* UdpSocket.cpp */,
 			);
 			path = posix;
-			sourceTree = "<group>";
-		};
-		E811B46C17FB6AF900C6135C /* win32 */ = {
-			isa = PBXGroup;
-			children = (
-				E811B46D17FB6AF900C6135C /* NetworkingUtilsWin.cpp */,
-				E811B46E17FB6AF900C6135C /* UdpSocketWin.cpp */,
-			);
-			path = win32;
 			sourceTree = "<group>";
 		};
 		E811B46F17FB6AF900C6135C /* osc */ = {
@@ -482,8 +468,6 @@
 				E811B48917FB6AF900C6135C /* IpEndpointName.cpp in Sources */,
 				E811B48A17FB6AF900C6135C /* NetworkingUtils.cpp in Sources */,
 				E811B48B17FB6AF900C6135C /* UdpSocket.cpp in Sources */,
-				E811B48C17FB6AF900C6135C /* NetworkingUtilsWin.cpp in Sources */,
-				E811B48D17FB6AF900C6135C /* UdpSocketWin.cpp in Sources */,
 				E811B48E17FB6AF900C6135C /* OscOutboundPacketStream.cpp in Sources */,
 				E811B48F17FB6AF900C6135C /* OscPrintReceivedElements.cpp in Sources */,
 				E811B49017FB6AF900C6135C /* OscReceivedElements.cpp in Sources */,
@@ -661,6 +645,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_52)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)Debug";
 				WRAPPER_EXTENSION = app;
 			};
@@ -758,6 +743,7 @@
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_50)",
 					"$(LIBRARY_SEARCH_PATHS_QUOTED_FOR_TARGET_51)",
 				);
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				WRAPPER_EXTENSION = app;
 			};

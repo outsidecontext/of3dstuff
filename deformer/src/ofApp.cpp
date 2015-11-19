@@ -5,8 +5,16 @@ void ofApp::setup(){
     
     
     cam.setDistance(100);
-    sphere.set(30, 80);
-    sphereBase.set(30, 80);
+    sphere.set(30, 120);
+    sphereBase.set(30, 120);
+    
+    cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+    cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+//    cylinder.set(30, 5);
+//    cylinderBase.set(30, 5);
+//    cylinder.set(30, 60);
+//    cylinderBase.set(30, 60);
+
     
     pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
     pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
@@ -45,6 +53,7 @@ void ofApp::setup(){
     noiseParams.add(noiseOutMult.set("mult out", 10, 1, 100));
     noiseParams.add(isNoiseFromNormal.set("from normals", false));
     gui.setup(noiseParams);
+    gui.add(isCylinderActive.set("cyclinder", false));
     gui.loadFromFile("settings.xml");
 }
 
@@ -54,11 +63,20 @@ void ofApp::update(){
                            sin(ofGetElapsedTimef()*.8f) * 60,
                            -cos(ofGetElapsedTimef()*.8f) * 60);
     spotLight.setOrientation( ofVec3f( 0, cos(ofGetElapsedTimef()) * RAD_TO_DEG, 0) );
-    spotLight.setPosition( mouseX, mouseY, 200);
+    spotLight.setPosition( 60, 60, 200);
     
     auto mesh = sphereBase.getMeshPtr();
-    auto updateMesh = sphere.getMeshPtr();
+    auto MeshOut = sphere.getMeshPtr();
+    updateMesh(mesh, MeshOut);
+    if (isCylinderActive) {
+        mesh = cylinderBase.getMeshPtr();
+        MeshOut = cylinder.getMeshPtr();
+        updateMesh(mesh, MeshOut);
+    }
     
+}
+
+void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
     for (int i=0; i<mesh->getNumVertices(); i++) {
         auto vertex = mesh->getVertex(i);
         auto normal = mesh->getNormal(i);
@@ -77,7 +95,7 @@ void ofApp::update(){
         float noise = ofNoise(noiseVert.z*noiseIn.get().x, noiseVert.x*noiseIn.get().y, noiseVert.y*noiseIn.get().z) -0.5;
         vertex += normal * (noise * noiseOutMult);
         // update vert
-        updateMesh->setVertex(i, vertex);
+        MeshOut->setVertex(i, vertex);
     }
 }
 
@@ -95,11 +113,25 @@ void ofApp::draw(){
     if (bSpotLight) spotLight.enable();
     if (bDirLight) directionalLight.enable();
     
-    
     ofSetColor(255);
     //vbo.drawWireframe();
-    if (ofGetKeyPressed('w')) sphere.draw(OF_MESH_WIREFRAME);
-    else sphere.draw();
+    if (ofGetKeyPressed('w')) {
+        if (isCylinderActive) cylinder.draw(OF_MESH_WIREFRAME);
+        else sphere.draw(OF_MESH_WIREFRAME);
+    }
+    else {
+        if (isCylinderActive) {
+            ofPushMatrix();
+            ofTranslate(0, -40);
+            sphere.draw();
+            ofTranslate(0, 40);
+            cylinder.draw();
+            ofTranslate(0, 40);
+            sphere.draw();
+            ofPopMatrix();
+        }
+        else sphere.draw();
+    }
     
     // lights
     if (!bPointLight) pointLight.disable();

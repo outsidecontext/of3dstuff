@@ -8,6 +8,7 @@ class ofApp : public ofBaseApp{
 public:
     void setup();
     void update();
+    void updateMesh(ofMesh* mesh, ofMesh* MeshOut);
     void draw();
     void createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors);
     void createGeoSphere(int stacks=32, int slices=32);
@@ -25,8 +26,17 @@ public:
     void gotMessage(ofMessage msg);
     
     ofVboMesh vbo;
+    
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
+    
+    ofCylinderPrimitive cylinderBase;
+    ofCylinderPrimitive cylinder;
+//    ofIcoSpherePrimitive cylinderBase;
+//    ofIcoSpherePrimitive cylinder;
+//    ofConePrimitive cylinderBase;
+//    ofConePrimitive cylinder;
+    
     ofEasyCam cam;
     
     
@@ -50,4 +60,6 @@ public:
     ofParameter<float> noiseOutMult;
     ofParameter<bool> isNoiseFromNormal;
     ofParameterGroup noiseParams;
+    
+    ofParameter<bool> isCylinderActive;
 };

@@ -11,3 +11,4 @@ else
 fi
 
 ${PREFIX}patriciogonzalezvivo/ofxTuio
+${PREFIX}obviousjim/ofxDOF
