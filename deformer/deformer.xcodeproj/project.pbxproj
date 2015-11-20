@@ -362,6 +362,70 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>241A8C966DB5CC471192A220</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxDOF.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxDOF/src/ofxDOF.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>FF062DCABAC89914E6093758</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>682AE33A515E9EAD18C321A2</string>
+					<string>241A8C966DB5CC471192A220</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>B922E169D182E0584C76B14A</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>FF062DCABAC89914E6093758</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxDOF</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>1FB13B2C1658CA138B0E96F6</key>
+			<dict>
+				<key>fileRef</key>
+				<string>682AE33A515E9EAD18C321A2</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>682AE33A515E9EAD18C321A2</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxDOF.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxDOF/src/ofxDOF.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>9FECF0FCF0CCAEC9C58FE54F</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -1205,6 +1269,7 @@
 				<key>children</key>
 				<array>
 					<string>2C8F245ACBE61E28646C17F2</string>
+					<string>B922E169D182E0584C76B14A</string>
 					<string>480A780D8D0308AE4A368801</string>
 				</array>
 				<key>isa</key>
@@ -1375,6 +1440,7 @@
 					<key>HEADER_SEARCH_PATHS</key>
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
+						<string>src</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/include</string>
@@ -1385,6 +1451,7 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/lib/osx</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
+						<string>../../../addons/ofxDOF/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1448,6 +1515,7 @@
 					<key>HEADER_SEARCH_PATHS</key>
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
+						<string>src</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/include</string>
@@ -1458,6 +1526,7 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/lib/osx</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
+						<string>../../../addons/ofxDOF/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1519,6 +1588,7 @@
 					<string>483FA4F6D5FA6422C559B1F5</string>
 					<string>8DED5056525646FA71980866</string>
 					<string>B8846EF8E504895A4A9EFEC0</string>
+					<string>1FB13B2C1658CA138B0E96F6</string>
 					<string>856AA354D08AB4B323081444</string>
 					<string>5CBB2AB3A60F65431D7B555D</string>
 					<string>B266578FC55D23BFEBC042E7</string>
@@ -1615,6 +1685,7 @@
 					<key>HEADER_SEARCH_PATHS</key>
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
+						<string>src</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/include</string>
@@ -1625,6 +1696,7 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/lib/osx</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
+						<string>../../../addons/ofxDOF/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
@@ -1678,6 +1750,7 @@
 					<key>HEADER_SEARCH_PATHS</key>
 					<array>
 						<string>$(OF_CORE_HEADERS)</string>
+						<string>src</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/include</string>
@@ -1688,6 +1761,7 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/lib/osx</string>
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
+						<string>../../../addons/ofxDOF/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>

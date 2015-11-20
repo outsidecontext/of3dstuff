@@ -1,12 +1,18 @@
 #include "ofApp.h"
 
+#define NOISE_MODE_COUNT 13
+int niceNoiseMods[NOISE_MODE_COUNT] = {3,4,5,6,7,10,12,20,24,30,120,240,241};
+int niceNoiseModI = 0;
+
 //--------------------------------------------------------------
 void ofApp::setup(){
     
     
+    depthOfField.setup(ofGetWidth(), ofGetHeight());
     cam.setDistance(100);
     sphere.set(30, 120);
     sphereBase.set(30, 120);
+    ofSetSmoothLighting(true);
     
     cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
     cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
@@ -35,11 +41,12 @@ void ofApp::setup(){
     
     bShiny = true;
     // 0 - 128
-    material.setShininess( 10 );
+    material.setShininess( 30 );
     material.setSpecularColor(ofColor(255, 255, 255, 255));
     
-    bPointLight = bDirLight = true;
-    bSpotLight = false;
+    bDirLight = true;
+    bSpotLight = true;
+    bPointLight = false;
     
     ofDisableArbTex();
     ofLogoImage.load("of.png");
@@ -47,12 +54,22 @@ void ofApp::setup(){
     
     // GUI
     isGuiVisible = true;
+    gui.setup();
+    
     noiseParams.setName("settings");
     noiseParams.add(noiseIn.set("input", ofVec3f(0), ofVec3f(-100), ofVec3f(100)));
-    noiseParams.add(noiseInDiv.set("divide in", 100, 1, 1000));
+    noiseParams.add(noiseInDiv.set("divide in", 500, 1, 1000));
     noiseParams.add(noiseOutMult.set("mult out", 10, 1, 100));
     noiseParams.add(isNoiseFromNormal.set("from normals", false));
-    gui.setup(noiseParams);
+    noiseParams.add(noiseVertMod.set("vert mod", 30, 1, 241));
+    gui.add(noiseParams);
+    
+    dofParams.add(isDofEnabled.set("enabled", false));
+    dofParams.add(focalDistance.set("focal distance", 23, 0, 150));
+    dofParams.add(focalRange.set("focal range", 4, 0, 10));
+    dofParams.add(blurAmount.set("blur amount", 0.7, 0, 3));
+    gui.add(dofParams);
+    
     gui.add(isCylinderActive.set("cyclinder", false));
     gui.loadFromFile("settings.xml");
 }
@@ -62,8 +79,8 @@ void ofApp::update(){
     pointLight.setPosition(cos(ofGetElapsedTimef()*.6f) * 60,
                            sin(ofGetElapsedTimef()*.8f) * 60,
                            -cos(ofGetElapsedTimef()*.8f) * 60);
-    spotLight.setOrientation( ofVec3f( 0, cos(ofGetElapsedTimef()) * RAD_TO_DEG, 0) );
     spotLight.setPosition( 60, 60, 200);
+    spotLight.lookAt(ofVec3f(30, 0, -50));
     
     auto mesh = sphereBase.getMeshPtr();
     auto MeshOut = sphere.getMeshPtr();
@@ -73,6 +90,11 @@ void ofApp::update(){
         MeshOut = cylinder.getMeshPtr();
         updateMesh(mesh, MeshOut);
     }
+    
+    // update depth of field
+    depthOfField.setBlurAmount(blurAmount);
+    depthOfField.setFocalDistance(focalDistance);
+    depthOfField.setFocalRange(focalRange);
     
 }
 
@@ -86,14 +108,21 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
             // use normals
             //noiseVert = normal / noiseInDiv;
             // Sydney Opera House
-            float scalar = i % 40;
+            float scalar = i % noiseVertMod;
             // fixed spiral
             //float scalar = 0;
-            //if (i % 80 == 0) scalar = 1;
+            //if (i%noiseVertMod == 0) scalar = 1;
+            
             noiseVert = ofVec3f(scalar, scalar, scalar) * noiseInDiv;
         }
         float noise = ofNoise(noiseVert.z*noiseIn.get().x, noiseVert.x*noiseIn.get().y, noiseVert.y*noiseIn.get().z) -0.5;
-        vertex += normal * (noise * noiseOutMult);
+        
+        auto nextVertex = vertex += normal * (noise * noiseOutMult);
+        auto lastVert = MeshOut->getVertex(i);
+        vertex.x = ofLerp(lastVert.x, nextVertex.x, 0.1);
+        vertex.y = ofLerp(lastVert.y, nextVertex.y, 0.1);
+        vertex.z = ofLerp(lastVert.z, nextVertex.z, 0.1);
+        
         // update vert
         MeshOut->setVertex(i, vertex);
     }
@@ -102,18 +131,21 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
+    
+    if (isDofEnabled) depthOfField.begin();
     ofBackgroundGradient(ofColor(255), ofColor(100));
     ofEnableDepthTest();
-    ofEnableLighting();
     cam.begin();
-    material.begin();
     
     // lights
+    ofEnableLighting();
     if (bPointLight) pointLight.enable();
     if (bSpotLight) spotLight.enable();
     if (bDirLight) directionalLight.enable();
     
     ofSetColor(255);
+    material.begin();
+    sphere.pan(.1);
     //vbo.drawWireframe();
     if (ofGetKeyPressed('w')) {
         if (isCylinderActive) cylinder.draw(OF_MESH_WIREFRAME);
@@ -132,23 +164,23 @@ void ofApp::draw(){
         }
         else sphere.draw();
     }
+    material.end();
     
-    // lights
+    // lights / DOF
     if (!bPointLight) pointLight.disable();
     if (!bSpotLight) spotLight.disable();
     if (!bDirLight) directionalLight.disable();
-    
-    material.end();
-    cam.end();
     ofDisableLighting();
-    
-//    ofSetColor( pointLight.getDiffuseColor() );
-//    if(bPointLight) pointLight.draw();
-//    
-//    ofSetColor(255, 255, 255);
-//    ofSetColor( spotLight.getDiffuseColor() );
-//    if(bSpotLight) spotLight.draw();
-    
+    cam.end();
+    if (isDofEnabled) {
+        depthOfField.end();
+        if(ofGetKeyPressed('d')){
+            depthOfField.drawFocusAssist(0, 0);
+        }
+        else{
+            depthOfField.getFbo().draw(0, 0);
+        }
+    }
     
     ofDisableDepthTest();
     ofSetColor(255);
@@ -253,7 +285,7 @@ void ofApp::keyPressed(int key){
         case 's':
             bShiny	= !bShiny;
             if (bShiny) material.setShininess( 120 );
-            else material.setShininess( 10 );
+            else material.setShininess( 30 );
             break;
         case 'x':
             bSmoothLighting = !bSmoothLighting;
@@ -271,11 +303,13 @@ void ofApp::keyPressed(int key){
             spotLight.setSpotlightCutOff(spotLight.getSpotlightCutOff()-1);
             break;
         case OF_KEY_RIGHT:
-            // setSpotConcentration is clamped between 0 - 128 //
+            if (++niceNoiseModI > NOISE_MODE_COUNT-1) niceNoiseModI = 0;
+            noiseVertMod = niceNoiseMods[niceNoiseModI];
             spotLight.setSpotConcentration(spotLight.getSpotConcentration()+1);
             break;
         case OF_KEY_LEFT:
-            // setSpotConcentration is clamped between 0 - 128 //
+            if (--niceNoiseModI < 0) niceNoiseModI = NOISE_MODE_COUNT-1;
+            noiseVertMod = niceNoiseMods[niceNoiseModI];
             spotLight.setSpotConcentration(spotLight.getSpotConcentration()-1);
             break;
         default:

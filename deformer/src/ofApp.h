@@ -2,6 +2,7 @@
 
 #include "ofMain.h"
 #include "ofxGui.h"
+#include "ofxDOF.h"
 
 class ofApp : public ofBaseApp{
     
@@ -26,6 +27,7 @@ public:
     void gotMessage(ofMessage msg);
     
     ofVboMesh vbo;
+    ofxDOF depthOfField;
     
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
@@ -59,7 +61,14 @@ public:
     ofParameter<float> noiseInDiv;
     ofParameter<float> noiseOutMult;
     ofParameter<bool> isNoiseFromNormal;
+    ofParameter<int> noiseVertMod;
     ofParameterGroup noiseParams;
     
     ofParameter<bool> isCylinderActive;
+    
+    ofParameter<bool> isDofEnabled;
+    ofParameter<float> focalDistance;
+    ofParameter<float> focalRange;
+    ofParameter<float> blurAmount;
+    ofParameterGroup dofParams;
 };
