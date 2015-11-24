@@ -13,6 +13,7 @@ public:
     void draw();
     void updateNormals(ofMesh* mesh);
     void setNormals( ofMesh &mesh );
+    bool checkSphereSafeIndex(int i);
     void createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors);
     void createGeoSphere(int stacks=32, int slices=32);
     
@@ -39,8 +40,6 @@ public:
 //    ofCylinderPrimitive cylinder;
     ofIcoSpherePrimitive cylinderBase;
     ofIcoSpherePrimitive cylinder;
-//    ofConePrimitive cylinderBase;
-//    ofConePrimitive cylinder;
     
     ofEasyCam cam;
     
@@ -68,6 +67,7 @@ public:
     ofParameterGroup noiseParams;
     
     ofParameter<bool> isCylinderActive;
+    ofParameter<bool> isPhongShaderOn;
     
     ofParameter<bool> isDofEnabled;
     ofParameter<float> focalDistance;

@@ -1,5 +1,6 @@
 #include "ofApp.h"
 
+#define UV_SPHERE_RES 128
 #define NOISE_MODE_COUNT 13
 int niceNoiseMods[NOISE_MODE_COUNT] = {3,4,5,6,7,10,12,20,24,30,120,240,241};
 int niceNoiseModI = 0;
@@ -10,20 +11,20 @@ void ofApp::setup(){
     
     depthOfField.setup(ofGetWidth(), ofGetHeight());
     cam.setDistance(100);
-    sphere.set(30, 120);
-    sphereBase.set(30, 120);
+    sphere.set(30, UV_SPHERE_RES);
+    sphereBase.set(30, UV_SPHERE_RES);
     ofSetSmoothLighting(true);
+    ofSetLineWidth(3);
     
     phongShader.load("Shaders/Phong/Phong.vert", "Shaders/Phong/Phong.frag");
     
-//    cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-//    cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+    // cylinder
+    //cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+    //cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+    
+    // or icosphere
     cylinder.set(30, 5);
-    cylinder.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
     cylinderBase.set(30, 5);
-    cylinderBase.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
-//    cylinder.set(30, 60);
-//    cylinderBase.set(30, 60);
 
     
     pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
@@ -74,6 +75,7 @@ void ofApp::setup(){
     dofParams.add(blurAmount.set("blur amount", 0.7, 0, 3));
     gui.add(dofParams);
     
+    gui.add(isPhongShaderOn.set("phong shader", false));
     gui.add(isCylinderActive.set("cyclinder", false));
     gui.loadFromFile("settings.xml");
 }
@@ -93,6 +95,10 @@ void ofApp::update(){
         mesh = cylinderBase.getMeshPtr();
         MeshOut = cylinder.getMeshPtr();
         updateMesh(mesh, MeshOut);
+    }
+    if (ofGetKeyPressed('r')) {
+        updateNormals(MeshOut);
+        if (isCylinderActive) setNormals(*MeshOut);
     }
     
     // update depth of field
@@ -130,11 +136,6 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
         // update vert
         MeshOut->setVertex(i, vertex);
     }
-    
-    if (ofGetKeyPressed('r')) {
-        updateNormals(MeshOut);
-        //setNormals(*MeshOut);
-    }
 }
 
 //--------------------------------------------------------------
@@ -153,8 +154,10 @@ void ofApp::draw(){
     if (bDirLight) directionalLight.enable();
     
     ofSetColor(255);
-    //phongShader.begin();
-    //phongShader.setUniform1i("numLights", 2);
+    if (isPhongShaderOn) {
+        phongShader.begin();
+        phongShader.setUniform1i("numLights", 1);
+    }
     
     material.begin();
     //sphere.pan(.1);
@@ -177,7 +180,7 @@ void ofApp::draw(){
         else sphere.draw();
     }
     material.end();
-    //phongShader.end();
+    if (isPhongShaderOn) phongShader.end();
     
     // lights / DOF
     if (!bPointLight) pointLight.disable();
@@ -188,18 +191,18 @@ void ofApp::draw(){
     // normals debug
     auto mesh = sphere.getMeshPtr();
     if(ofGetKeyPressed('n')){
-        ofDisableLighting();
         vector<ofVec3f> n = mesh->getNormals();
         vector<ofVec3f> v = mesh->getVertices();
-        float normalLength = 5.;
-        ofSetColor(255);
+        float normalLength = 3;
+        
         for(int i=0; i < n.size() ;i++){
-            ofDrawLine(v[i].x,v[i].y,v[i].z,
-                   v[i].x+n[i].x*normalLength,v[i].y+n[i].y*normalLength,v[i].z+n[i].z*normalLength);
-            ofDrawLine(.98*v[i].x,.98*v[i].y,.98*v[i].z,
-                   .98*v[i].x+n[i].x*normalLength*.2,.98*v[i].y+n[i].y*normalLength*.2,.98*v[i].z+n[i].z*normalLength*.2);
-            ofDrawLine(.98*v[i].x+n[i].x*normalLength*.2,.98*v[i].y+n[i].y*normalLength*.2,.98*v[i].z+n[i].z*normalLength*.2,
-                   v[i].x+n[i].x*normalLength*.2,v[i].y+n[i].y*normalLength*.2,v[i].z+n[i].z*normalLength*.2);
+            int rowEnd = (UV_SPHERE_RES*2) + 1;
+            if (i % rowEnd == 0) ofSetColor(255, 255, 0);
+            else if ( (i+1) % rowEnd == 0 ) ofSetColor(0, 255, 255);
+            else ofSetColor(255);
+            ofDrawBitmapString(ofToString(i), v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
+            ofDrawLine(v[i].x, v[i].y, v[i].z,
+                   v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
         }
     }
     
@@ -219,6 +222,7 @@ void ofApp::draw(){
     ofSetColor(255);
     if (isGuiVisible) gui.draw();
 }
+
 
 // This works for OF_PRIMITIVE_TRIANGLE_STRIP
 // based on discussions here:
@@ -250,17 +254,49 @@ void ofApp::updateNormals(ofMesh* mesh) {
         normal_buffer[mesh->getIndex(j+2)].push_back( normal );
     }
     
+    // TODO add normal per index instead?
+    
     // now loop over all normals for each vertex
     // sum and normalise each one to get the average normal
-    for( int i = 0; i < mesh->getNumVertices(); i++ ){
+    int n = mesh->getNumVertices();
+    for( int i = 0; i < n; i++ ){
         ofVec3f normal;
-        for( int j = 0; j < normal_buffer[i].size(); j++ )
-            normal += normal_buffer[i][j];
+        
+        int index = i;
+        // add together all the normals for the current vert
+        for( int j = 0; j < normal_buffer[index].size(); j++ )
+            normal += normal_buffer[index][j];
+        
+        // this is a bit funky but it works...
+        // the vertices along the seam of the UV sphere overlap and produce slightly different normals
+        // we need to average the normals along this seam
+        // first work out the end of a strip using ( the sphere resolution * 2 ) + 1
+        // then use mod to work out if this is the first or last vert of a strip
+        // if it is, add the normals from the OTHER end of strip to this one so it can be averaged
+        int rowEnd = (UV_SPHERE_RES*2) + 1;
+        // start point
+        if (i % rowEnd == 0 && i > 2) {
+            index = i + (UV_SPHERE_RES*2);
+            for( int j = 0; j < normal_buffer[index].size(); j++ )
+                normal += normal_buffer[index][j];
+        }
+        // end point
+        if ( (i+1) % rowEnd == 0  && i > 2) {
+            index = i - (UV_SPHERE_RES*2);
+            for( int j = 0; j < normal_buffer[index].size(); j++ )
+                normal += normal_buffer[index][j];
+        }
+        
         normal.normalize();
         mesh->addNormal(normal);
     }
     
     delete [] normal_buffer;
+}
+
+bool ofApp::checkSphereSafeIndex(int i) {
+    int rowEnd = (UV_SPHERE_RES*2) + 1;
+    return (i % rowEnd != 0);
 }
 
 // This works for OF_PRIMITIVE_TRIANGLES
