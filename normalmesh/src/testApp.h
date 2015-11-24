@@ -2,7 +2,7 @@
 
 #include "ofMain.h"
 #include "OscReceiver.h"
-#include "ofxTuio.h"
+//#include "ofxTuio.h"
 
 class testApp : public ofBaseApp {
 public:
@@ -37,9 +37,9 @@ public:
     OscReceiver osc;
     
     // TUIO
-    void	tuioAdded(ofxTuioCursor & tuioCursor);
-	void	tuioRemoved(ofxTuioCursor & tuioCursor);
-	void	tuioUpdated(ofxTuioCursor & tuioCursor);
+//    void	tuioAdded(ofxTuioCursor & tuioCursor);
+//	void	tuioRemoved(ofxTuioCursor & tuioCursor);
+//	void	tuioUpdated(ofxTuioCursor & tuioCursor);
 
-    ofxTuioClient   tuioClient;
+//    ofxTuioClient   tuioClient;
 };

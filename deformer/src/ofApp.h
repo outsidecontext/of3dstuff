@@ -11,6 +11,8 @@ public:
     void update();
     void updateMesh(ofMesh* mesh, ofMesh* MeshOut);
     void draw();
+    void updateNormals(ofMesh* mesh);
+    void setNormals( ofMesh &mesh );
     void createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors);
     void createGeoSphere(int stacks=32, int slices=32);
     
@@ -28,14 +30,15 @@ public:
     
     ofVboMesh vbo;
     ofxDOF depthOfField;
+    ofShader phongShader;
     
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
     
-    ofCylinderPrimitive cylinderBase;
-    ofCylinderPrimitive cylinder;
-//    ofIcoSpherePrimitive cylinderBase;
-//    ofIcoSpherePrimitive cylinder;
+//    ofCylinderPrimitive cylinderBase;
+//    ofCylinderPrimitive cylinder;
+    ofIcoSpherePrimitive cylinderBase;
+    ofIcoSpherePrimitive cylinder;
 //    ofConePrimitive cylinderBase;
 //    ofConePrimitive cylinder;
     

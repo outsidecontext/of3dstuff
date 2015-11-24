@@ -14,10 +14,14 @@ void ofApp::setup(){
     sphereBase.set(30, 120);
     ofSetSmoothLighting(true);
     
-    cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-    cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-//    cylinder.set(30, 5);
-//    cylinderBase.set(30, 5);
+    phongShader.load("Shaders/Phong/Phong.vert", "Shaders/Phong/Phong.frag");
+    
+//    cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+//    cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
+    cylinder.set(30, 5);
+    cylinder.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
+    cylinderBase.set(30, 5);
+    cylinderBase.setMode(OF_PRIMITIVE_TRIANGLE_STRIP);
 //    cylinder.set(30, 60);
 //    cylinderBase.set(30, 60);
 
@@ -126,6 +130,11 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
         // update vert
         MeshOut->setVertex(i, vertex);
     }
+    
+    if (ofGetKeyPressed('r')) {
+        updateNormals(MeshOut);
+        //setNormals(*MeshOut);
+    }
 }
 
 //--------------------------------------------------------------
@@ -144,34 +153,58 @@ void ofApp::draw(){
     if (bDirLight) directionalLight.enable();
     
     ofSetColor(255);
+    //phongShader.begin();
+    //phongShader.setUniform1i("numLights", 2);
+    
     material.begin();
-    sphere.pan(.1);
-    //vbo.drawWireframe();
+    //sphere.pan(.1);
+    
     if (ofGetKeyPressed('w')) {
         if (isCylinderActive) cylinder.draw(OF_MESH_WIREFRAME);
         else sphere.draw(OF_MESH_WIREFRAME);
     }
     else {
         if (isCylinderActive) {
-            ofPushMatrix();
-            ofTranslate(0, -40);
-            sphere.draw();
-            ofTranslate(0, 40);
+            //ofPushMatrix();
+            //ofTranslate(0, -40);
+            //sphere.draw();
+            //ofTranslate(0, 40);
             cylinder.draw();
-            ofTranslate(0, 40);
-            sphere.draw();
-            ofPopMatrix();
+            //ofTranslate(0, 40);
+            //sphere.draw();
+            //ofPopMatrix();
         }
         else sphere.draw();
     }
     material.end();
+    //phongShader.end();
     
     // lights / DOF
     if (!bPointLight) pointLight.disable();
     if (!bSpotLight) spotLight.disable();
     if (!bDirLight) directionalLight.disable();
     ofDisableLighting();
+    
+    // normals debug
+    auto mesh = sphere.getMeshPtr();
+    if(ofGetKeyPressed('n')){
+        ofDisableLighting();
+        vector<ofVec3f> n = mesh->getNormals();
+        vector<ofVec3f> v = mesh->getVertices();
+        float normalLength = 5.;
+        ofSetColor(255);
+        for(int i=0; i < n.size() ;i++){
+            ofDrawLine(v[i].x,v[i].y,v[i].z,
+                   v[i].x+n[i].x*normalLength,v[i].y+n[i].y*normalLength,v[i].z+n[i].z*normalLength);
+            ofDrawLine(.98*v[i].x,.98*v[i].y,.98*v[i].z,
+                   .98*v[i].x+n[i].x*normalLength*.2,.98*v[i].y+n[i].y*normalLength*.2,.98*v[i].z+n[i].z*normalLength*.2);
+            ofDrawLine(.98*v[i].x+n[i].x*normalLength*.2,.98*v[i].y+n[i].y*normalLength*.2,.98*v[i].z+n[i].z*normalLength*.2,
+                   v[i].x+n[i].x*normalLength*.2,v[i].y+n[i].y*normalLength*.2,v[i].z+n[i].z*normalLength*.2);
+        }
+    }
+    
     cam.end();
+    
     if (isDofEnabled) {
         depthOfField.end();
         if(ofGetKeyPressed('d')){
@@ -185,6 +218,94 @@ void ofApp::draw(){
     ofDisableDepthTest();
     ofSetColor(255);
     if (isGuiVisible) gui.draw();
+}
+
+// This works for OF_PRIMITIVE_TRIANGLE_STRIP
+// based on discussions here:
+// http://devmaster.net/posts/6065/calculating-normals-of-a-mesh
+// and http://www.gamedev.net/topic/634094-calculating-normals-for-triangle-strip-model-not-terrain/
+//
+void ofApp::updateNormals(ofMesh* mesh) {
+    
+    mesh->clearNormals();
+    vector<ofVec3f>* normal_buffer = new vector<ofVec3f>[mesh->getNumVertices()];
+    
+    // store normals for each triangle/face
+    for (int j=0; j<mesh->getNumIndices()-2; j++) {
+        // cache the 3 verts that make up the current triangle/face
+        ofVec3f v0 = mesh->getVertex(mesh->getIndex(j));
+        ofVec3f v1 = mesh->getVertex(mesh->getIndex(j+1));
+        ofVec3f v2 = mesh->getVertex(mesh->getIndex(j+2));
+        
+        // calculate the triangle/face normal e.g. a right angle from the face
+        ofVec3f normal = (v1-v0).cross(v2-v0);
+        
+        // invert each even normal
+        // this is because vert ordering alternates between CW and CCW
+        if (j%2==0) normal *= -1;
+        
+        // Store the normal for each of the vertices that make up the face.
+        normal_buffer[mesh->getIndex(j+0)].push_back( normal );
+        normal_buffer[mesh->getIndex(j+1)].push_back( normal );
+        normal_buffer[mesh->getIndex(j+2)].push_back( normal );
+    }
+    
+    // now loop over all normals for each vertex
+    // sum and normalise each one to get the average normal
+    for( int i = 0; i < mesh->getNumVertices(); i++ ){
+        ofVec3f normal;
+        for( int j = 0; j < normal_buffer[i].size(); j++ )
+            normal += normal_buffer[i][j];
+        normal.normalize();
+        mesh->addNormal(normal);
+    }
+    
+    delete [] normal_buffer;
+}
+
+// This works for OF_PRIMITIVE_TRIANGLES
+// from https://gist.github.com/patriciogonzalezvivo/5473484
+void ofApp::setNormals( ofMesh &mesh ){
+    
+    //The number of the vertices
+    int nV = mesh.getNumVertices();
+    
+    //The number of the triangles
+    int nT = mesh.getNumIndices() / 3;
+    
+    vector<ofPoint> norm( nV ); //Array for the normals
+    
+    //Scan all the triangles. For each triangle add its
+    //normal to norm's vectors of triangle's vertices
+    for (int t=0; t<nT; t++) {
+        
+        //Get indices of the triangle t
+        int i1 = mesh.getIndex( 3 * t );
+        int i2 = mesh.getIndex( 3 * t + 1 );
+        int i3 = mesh.getIndex( 3 * t + 2 );
+        
+        //Get vertices of the triangle
+        const ofPoint &v1 = mesh.getVertex( i1 );
+        const ofPoint &v2 = mesh.getVertex( i2 );
+        const ofPoint &v3 = mesh.getVertex( i3 );
+        
+        //Compute the triangle's normal
+        ofPoint dir = ( (v2 - v1).cross( v3 - v1 ) ).normalize();
+        
+        //Accumulate it to norm array for i1, i2, i3
+        norm[ i1 ] += dir;
+        norm[ i2 ] += dir;
+        norm[ i3 ] += dir;
+    }
+    
+    //Normalize the normal's length
+    for (int i=0; i<nV; i++) {
+        norm[i].normalize();
+    }
+    
+    //Set the normals to mesh
+    mesh.clearNormals();
+    mesh.addNormals( norm );
 }
 
 void ofApp::createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors)

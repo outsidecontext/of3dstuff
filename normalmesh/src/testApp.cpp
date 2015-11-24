@@ -31,10 +31,10 @@ void testApp::setup() {
     rotation.set(0,0,0);
     //osc.setup();
     
-    tuioClient.start(3333);
-    ofAddListener(tuioClient.cursorAdded,this,&testApp::tuioAdded);
-	ofAddListener(tuioClient.cursorRemoved,this,&testApp::tuioRemoved);
-	ofAddListener(tuioClient.cursorUpdated,this,&testApp::tuioUpdated);
+//    tuioClient.start(3333);
+//    ofAddListener(tuioClient.cursorAdded,this,&testApp::tuioAdded);
+//	ofAddListener(tuioClient.cursorRemoved,this,&testApp::tuioRemoved);
+//	ofAddListener(tuioClient.cursorUpdated,this,&testApp::tuioUpdated);
 }
 
 void testApp::setupFbo(){
@@ -54,9 +54,9 @@ void testApp::update() {
     
     bool useTuioTouch = true;
     float blobx, bloby;
-    if (useTuioTouch) tuioClient.getMessage();
-    list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
-    list<ofxTuioCursor*>::iterator tit;
+//    if (useTuioTouch) tuioClient.getMessage();
+//    list<ofxTuioCursor*> cursors = tuioClient.getTuioCursors();
+//    list<ofxTuioCursor*>::iterator tit;
     
     //osc.update();
     //rotation.x = ofLerp(rotation.x, osc.acc.x*180, .01);
@@ -76,18 +76,18 @@ void testApp::update() {
             vertex.y*ofGetElapsedTimef()*0.01,
             vertex.z*0.01
         ) * 6;
-        if (useTuioTouch) {
-            for (tit=cursors.begin(); tit != cursors.end(); tit++) {
-                ofxTuioCursor *blob = (*tit);
-                float thresh = 3;
-                blobx = ofMap(blob->getX(), 0, 1, -50, 50);
-                bloby = ofMap(blob->getY(), 0, 1, 50, -50);
-                if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
-                    && bloby >= vertex.y-thresh && bloby <= vertex.y+thresh) {
-                    z = 6;
-                }
-            }
-        }
+//        if (useTuioTouch) {
+//            for (tit=cursors.begin(); tit != cursors.end(); tit++) {
+//                ofxTuioCursor *blob = (*tit);
+//                float thresh = 3;
+//                blobx = ofMap(blob->getX(), 0, 1, -50, 50);
+//                bloby = ofMap(blob->getY(), 0, 1, 50, -50);
+//                if (blobx >= vertex.x-thresh && blobx <= vertex.x+thresh
+//                    && bloby >= vertex.y-thresh && bloby <= vertex.y+thresh) {
+//                    z = 6;
+//                }
+//            }
+//        }
         vertex.z = ofLerp(vertex.z, z, 0.1);
         
         //float r = ofMap(x, <#float inputMin#>, <#float inputMax#>, <#float outputMin#>, <#float outputMax#>)
@@ -209,7 +209,7 @@ void testApp::draw() {
         ofDrawBitmapString("bias: " + ofToString(bias), 20, 20);
         ofDrawBitmapString("focus: " + ofToString(focus), 20, 40);
         ofSetColor(255);
-        tuioClient.drawCursors();
+//        tuioClient.drawCursors();
     }
 	
     ofSetWindowTitle(ofToString(ofGetFrameRate()));
@@ -312,17 +312,17 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 	
 }
 
-void testApp::tuioAdded(ofxTuioCursor &tuioCursor){
-	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
-	//cout << "Point n" << tuioCursor.getSessionId() << " add at " << loc << endl;
-}
-
-void testApp::tuioUpdated(ofxTuioCursor &tuioCursor){
-	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
-	//cout << "Point n" << tuioCursor.getSessionId() << " updated at " << loc << endl;
-}
-
-void testApp::tuioRemoved(ofxTuioCursor &tuioCursor){
-	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
-	//cout << "Point n" << tuioCursor.getSessionId() << " remove at " << loc << endl;
-}
+//void testApp::tuioAdded(ofxTuioCursor &tuioCursor){
+//	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+//	//cout << "Point n" << tuioCursor.getSessionId() << " add at " << loc << endl;
+//}
+//
+//void testApp::tuioUpdated(ofxTuioCursor &tuioCursor){
+//	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+//	//cout << "Point n" << tuioCursor.getSessionId() << " updated at " << loc << endl;
+//}
+//
+//void testApp::tuioRemoved(ofxTuioCursor &tuioCursor){
+//	ofPoint loc = ofPoint(tuioCursor.getX()*ofGetWidth(),tuioCursor.getY()*ofGetHeight());
+//	//cout << "Point n" << tuioCursor.getSessionId() << " remove at " << loc << endl;
+//}
