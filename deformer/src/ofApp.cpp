@@ -1,6 +1,6 @@
 #include "ofApp.h"
 
-#define UV_SPHERE_RES 128
+#define UV_SPHERE_RES 120
 #define NOISE_MODE_COUNT 13
 int niceNoiseMods[NOISE_MODE_COUNT] = {3,4,5,6,7,10,12,20,24,30,120,240,241};
 int niceNoiseModI = 0;
@@ -14,24 +14,22 @@ void ofApp::setup(){
     sphere.set(30, UV_SPHERE_RES);
     sphereBase.set(30, UV_SPHERE_RES);
     ofSetSmoothLighting(true);
-    ofSetLineWidth(3);
     
     phongShader.load("Shaders/Phong/Phong.vert", "Shaders/Phong/Phong.frag");
     
     // cylinder
     //cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
     //cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-    
     // or icosphere
-    cylinder.set(30, 5);
-    cylinderBase.set(30, 5);
+    cylinder.set(30, 6);
+    cylinderBase.set(30, 6);
 
     
     pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
     pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
     pointLight.setPointLight();
     
-    spotLight.setDiffuseColor( ofColor(255.f, 0.f, 0.f));
+    spotLight.setDiffuseColor( ofColor(250.f, 250.f, 250.f));
     spotLight.setSpecularColor( ofColor(255.f, 255.f, 255.f));
     spotLight.setSpotlight();
     // angle range between 0 - 90 in degrees
@@ -97,8 +95,8 @@ void ofApp::update(){
         updateMesh(mesh, MeshOut);
     }
     if (ofGetKeyPressed('r')) {
-        updateNormals(MeshOut);
         if (isCylinderActive) setNormals(*MeshOut);
+        else updateNormals(MeshOut);
     }
     
     // update depth of field
@@ -116,16 +114,20 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
         auto noiseVert = vertex / noiseInDiv;
         if (isNoiseFromNormal) {
             // use normals
-            //noiseVert = normal / noiseInDiv;
+            noiseVert = MeshOut->getNormal(i) / noiseInDiv;
             // Sydney Opera House
-            float scalar = i % noiseVertMod;
-            // fixed spiral
-            //float scalar = 0;
-            //if (i%noiseVertMod == 0) scalar = 1;
-            
-            noiseVert = ofVec3f(scalar, scalar, scalar) * noiseInDiv;
+            //float scalar = i % noiseVertMod;
+            //noiseVert = ofVec3f(scalar, scalar, scalar) * noiseInDiv;
         }
-        float noise = ofNoise(noiseVert.z*noiseIn.get().x, noiseVert.x*noiseIn.get().y, noiseVert.y*noiseIn.get().z) -0.5;
+        // simplex noise creates uneven shapes
+        float noise = ofNoise(noiseVert.z*noiseIn.get().z, noiseVert.x*noiseIn.get().x, noiseVert.y*noiseIn.get().y) -0.5;
+        // sin multiplier gives more even lumps
+        //noise = sin(noiseVert.z*noiseIn.get().x) * sin(noiseVert.x*noiseIn.get().y) * sin(noiseVert.y*noiseIn.get().z);
+        // cos multiplier gives more even lumps
+        //noise = cos(noiseVert.z*noiseIn.get().x) * cos(noiseVert.x*noiseIn.get().y) * cos(noiseVert.y*noiseIn.get().z);
+        
+        //if (noise > 0.2) noise = 0.5;
+        //if (noise < -0.2) noise = -0.5;
         
         auto nextVertex = vertex += normal * (noise * noiseOutMult);
         auto lastVert = MeshOut->getVertex(i);
@@ -160,7 +162,8 @@ void ofApp::draw(){
     }
     
     material.begin();
-    //sphere.pan(.1);
+    sphere.pan(.1);
+    cylinder.pan(.1);
     
     if (ofGetKeyPressed('w')) {
         if (isCylinderActive) cylinder.draw(OF_MESH_WIREFRAME);
@@ -168,14 +171,7 @@ void ofApp::draw(){
     }
     else {
         if (isCylinderActive) {
-            //ofPushMatrix();
-            //ofTranslate(0, -40);
-            //sphere.draw();
-            //ofTranslate(0, 40);
             cylinder.draw();
-            //ofTranslate(0, 40);
-            //sphere.draw();
-            //ofPopMatrix();
         }
         else sphere.draw();
     }
@@ -200,7 +196,7 @@ void ofApp::draw(){
             if (i % rowEnd == 0) ofSetColor(255, 255, 0);
             else if ( (i+1) % rowEnd == 0 ) ofSetColor(0, 255, 255);
             else ofSetColor(255);
-            ofDrawBitmapString(ofToString(i), v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
+            //ofDrawBitmapString(ofToString(i), v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
             ofDrawLine(v[i].x, v[i].y, v[i].z,
                    v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
         }
@@ -337,6 +333,7 @@ void ofApp::setNormals( ofMesh &mesh ){
     //Normalize the normal's length
     for (int i=0; i<nV; i++) {
         norm[i].normalize();
+        norm[i] *= -1;
     }
     
     //Set the normals to mesh

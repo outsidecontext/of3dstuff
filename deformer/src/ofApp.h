@@ -36,8 +36,8 @@ public:
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
     
-//    ofCylinderPrimitive cylinderBase;
-//    ofCylinderPrimitive cylinder;
+    // ofCylinderPrimitive cylinderBase;
+    // ofCylinderPrimitive cylinder;
     ofIcoSpherePrimitive cylinderBase;
     ofIcoSpherePrimitive cylinder;
     
@@ -65,6 +65,10 @@ public:
     ofParameter<bool> isNoiseFromNormal;
     ofParameter<int> noiseVertMod;
     ofParameterGroup noiseParams;
+    
+    // TODO: add light and material colours
+    // TODO: add shadow (FBO trick)
+    ofParameter<ofColor> spotLightColour;
     
     ofParameter<bool> isCylinderActive;
     ofParameter<bool> isPhongShaderOn;
