@@ -9,13 +9,14 @@ class ofApp : public ofBaseApp{
 public:
     void setup();
     void update();
-    void updateMesh(ofMesh* mesh, ofMesh* MeshOut);
     void draw();
+    
+    void updateMesh(ofMesh* mesh, ofMesh* MeshOut);
     void updateNormals(ofMesh* mesh);
     void setNormals( ofMesh &mesh );
-    bool checkSphereSafeIndex(int i);
+    
     void createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors);
-    void createGeoSphere(int stacks=32, int slices=32);
+    void createGeoSphere(ofVboMesh *vbo, int stacks=32, int slices=32);
     
     void keyPressed(int key);
     void keyReleased(int key);
@@ -29,9 +30,10 @@ public:
     void dragEvent(ofDragInfo dragInfo);
     void gotMessage(ofMessage msg);
     
-    ofVboMesh vbo;
+    
     ofxDOF depthOfField;
     ofShader phongShader;
+    ofShader toonShader;
     
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
@@ -39,22 +41,13 @@ public:
     ofIcoSpherePrimitive icoSphere;
     
     ofEasyCam cam;
-    
-    
-    ofLight pointLight;
     ofLight spotLight;
-    ofLight directionalLight;
-    
     ofMaterial material;
-    ofImage ofLogoImage;
-    
-    float radius;
-    bool bShiny;
     bool bSmoothLighting;
-    bool bPointLight, bSpotLight, bDirLight;
-    bool bUseTexture;
     
+    //////////////////////////////////////////////////////////////////////////////////
     // GUI
+    //////////////////////////////////////////////////////////////////////////////////
     bool isGuiVisible;
     ofxPanel gui;
     
@@ -66,8 +59,7 @@ public:
     ofParameter<int> noiseVertMod;
     ofParameterGroup noiseParams;
     
-    // TODO: add light and material colours
-    // TODO: add shadow (FBO trick)
+    // TODO: add shadow?
     ofParameter<ofColor> globalAmbient;
     ofParameter<ofVec3f> lightPosition;
     ofParameter<ofColor> lightAmbient;
@@ -88,6 +80,7 @@ public:
     
     ofParameter<bool> isIcoSphere;
     ofParameter<bool> isPhongShaderOn;
+    ofParameter<bool> isToonShaderOn;
     ofParameterGroup sphereParams;
     
     ofParameter<bool> isDofEnabled;

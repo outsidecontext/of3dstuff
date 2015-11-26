@@ -5,27 +5,25 @@
 int niceNoiseMods[NOISE_MODE_COUNT] = {3,4,5,6,7,10,12,20,24,30,120,240,241};
 int niceNoiseModI = 0;
 
-//--------------------------------------------------------------
+
 void ofApp::setup(){
     
-    
-    depthOfField.setup(ofGetWidth(), ofGetHeight());
+    // General setup
     cam.setDistance(100);
     sphere.set(30, UV_SPHERE_RES);
     sphereBase.set(30, UV_SPHERE_RES);
-    ofSetSmoothLighting(true);
     
+    // Shaders
     phongShader.load("Shaders/Phong/Phong.vert", "Shaders/Phong/Phong.frag");
+    toonShader.load("Shaders/Toon/Toon.vert", "Shaders/Toon/Toon.frag");
+    depthOfField.setup(ofGetWidth(), ofGetHeight());
     
     // icosphere
-    icoSphere.set(30, 6);
-    icoSphereBase.set(30, 6);
-
+    icoSphere.set(30, 4);
+    icoSphereBase.set(30, 4);
     
-    //pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
-    //pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
-    //pointLight.setPointLight();
-    
+    // Lights
+    ofSetSmoothLighting(true);
     spotLight.setDiffuseColor( ofColor(250.f, 250.f, 250.f));
     spotLight.setSpecularColor( ofColor(255.f, 255.f, 255.f));
     spotLight.setSpotlight();
@@ -34,23 +32,11 @@ void ofApp::setup(){
     // range 0 - 128, zero is even illumination, 128 is max falloff
     spotLight.setSpotConcentration( 45 );
     
-    directionalLight.setDiffuseColor(ofColor(0.f, 0.f, 255.f));
-    directionalLight.setSpecularColor(ofColor(255.f, 255.f, 255.f));
-    directionalLight.setDirectional();
-    directionalLight.setOrientation( ofVec3f(0, 90, 0) );
-    
-    bShiny = true;
+    // Material
     // 0 - 128
     material.setShininess( 30 );
     material.setSpecularColor(ofColor(255, 255, 255, 255));
-    
-    bDirLight = false;
-    bSpotLight = true;
-    bPointLight = false;
-    
     ofDisableArbTex();
-    ofLogoImage.load("of.png");
-    bUseTexture = true;
     
     // GUI
     isGuiVisible = true;
@@ -74,6 +60,7 @@ void ofApp::setup(){
     
     sphereParams.setName("Sphere");
     sphereParams.add(isPhongShaderOn.set("phong shader", true));
+    sphereParams.add(isToonShaderOn.set("toon shader", true));
     sphereParams.add(isIcoSphere.set("ico sphere", false));
     gui.add(sphereParams);
     
@@ -88,7 +75,7 @@ void ofApp::setup(){
     matParams.setName("Mat");
     matParams.add( matDiffuse.set("Mat Diffuse",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
     matParams.add( matAmbient.set("Mat Ambient",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
-    matParams.add( matEmissive.set("Mat Ambient", ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    matParams.add( matEmissive.set("Mat Emissive", ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
     matParams.add( matSpecular.set("Mat Specular", ofColor(255,255,255), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
     matParams.add( matShiny.set("Mat Shiny", 30, 1, 128));
     gui.add(matParams);
@@ -102,15 +89,15 @@ void ofApp::setup(){
     gui.loadFromFile("settings.xml");
 }
 
-//--------------------------------------------------------------
+
 void ofApp::update(){
-    //pointLight.setPosition(cos(ofGetElapsedTimef()*.6f) * 60, sin(ofGetElapsedTimef()*.8f) * 60, -cos(ofGetElapsedTimef()*.8f) * 60);
+    
+    // lights
     spotLight.setPosition( 60, 60, 200);
     spotLight.lookAt(ofVec3f(30, 0, -50));
-    
-    // update light from GUI
+    // from GUI
     ofSetGlobalAmbientColor( globalAmbient.get() );
-    //pointLight.setGlobalPosition( lightPosition.get() );
+    //spotLight.setGlobalPosition( lightPosition.get() );
     spotLight.setAmbientColor( lightAmbient.get() );
     spotLight.setDiffuseColor( lightDiffuse.get() );
     spotLight.setSpecularColor( lightSpecular.get() );
@@ -119,10 +106,10 @@ void ofApp::update(){
     //material.setColors(matDiffuse.get(), matAmbient.get(), matEmissive.get(), matSpecular.get());
     material.setShininess(matShiny.get());
     
+    // mesh
     auto mesh = sphereBase.getMeshPtr();
     auto MeshOut = sphere.getMeshPtr();
     updateMesh(mesh, MeshOut);
-    
     if (isIcoSphere) {
         mesh = icoSphereBase.getMeshPtr();
         MeshOut = icoSphere.getMeshPtr();
@@ -133,11 +120,12 @@ void ofApp::update(){
         else updateNormals(MeshOut);
     }
     
-    // update depth of field
+    // depth of field
     depthOfField.setBlurAmount(blurAmount);
     depthOfField.setFocalDistance(focalDistance);
     depthOfField.setFocalRange(focalRange);
     
+    // animate noise
     if (isNoiseAnimated) {
         float time = ofGetElapsedTimef();
         ofVec3f noiseAnim(
@@ -149,6 +137,92 @@ void ofApp::update(){
     }
     
 }
+
+void ofApp::draw(){
+    
+    if (isDofEnabled) depthOfField.begin();
+    ofBackgroundGradient(bgColourIn.get(), bgColourOut.get());
+    ofEnableDepthTest();
+    cam.begin();
+    
+    // lights
+    ofEnableLighting();
+    spotLight.enable();
+    ofSetColor(255);
+    
+    // Phong Shader
+    if (isPhongShaderOn) {
+        phongShader.begin();
+        phongShader.setUniform1i("numLights", 1);
+    }
+    else if (isToonShaderOn) {
+        toonShader.begin();
+        toonShader.setUniform1i("numLights", 1);
+    }
+    
+    material.begin();
+    sphere.pan(.1);
+    icoSphere.pan(.1);
+    
+    if (ofGetKeyPressed('w')) {
+        if (isIcoSphere) icoSphere.draw(OF_MESH_WIREFRAME);
+        else sphere.draw(OF_MESH_WIREFRAME);
+    }
+    else {
+        if (isIcoSphere) icoSphere.draw();
+        else sphere.draw();
+    }
+    material.end();
+    
+    // Phong / Toon shader end
+    if (isPhongShaderOn) phongShader.end();
+    else if (isToonShaderOn) toonShader.end();
+    
+    // lights / DOF
+    spotLight.disable();
+    ofDisableLighting();
+    
+    // normals debug
+    auto mesh = sphere.getMeshPtr();
+    if(ofGetKeyPressed('n')){
+        vector<ofVec3f> n = mesh->getNormals();
+        vector<ofVec3f> v = mesh->getVertices();
+        float normalLength = 3;
+        
+        for(int i=0; i < n.size() ;i++){
+            int rowEnd = (UV_SPHERE_RES*2) + 1;
+            if (i % rowEnd == 0) ofSetColor(255, 255, 0);
+            else if ( (i+1) % rowEnd == 0 ) ofSetColor(0, 255, 255);
+            else ofSetColor(255);
+            //ofDrawBitmapString(ofToString(i), v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
+            ofDrawLine(v[i].x, v[i].y, v[i].z,
+                   v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
+        }
+    }
+    
+    cam.end();
+    
+    if (isDofEnabled) {
+        depthOfField.end();
+        if(ofGetKeyPressed('d')){
+            depthOfField.drawFocusAssist(0, 0);
+        }
+        else{
+            depthOfField.getFbo().draw(0, 0);
+        }
+    }
+    
+    // GUI
+    ofDisableDepthTest();
+    ofSetColor(255);
+    if (isGuiVisible) gui.draw();
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// Mesh updaters
+//////////////////////////////////////////////////////////////////////////////////
 
 void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
     for (int i=0; i<mesh->getNumVertices(); i++) {
@@ -183,83 +257,6 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
         MeshOut->setVertex(i, vertex);
     }
 }
-
-//--------------------------------------------------------------
-void ofApp::draw(){
-    
-    if (isDofEnabled) depthOfField.begin();
-    ofBackgroundGradient(bgColourIn.get(), bgColourOut.get());
-    ofEnableDepthTest();
-    cam.begin();
-    
-    // lights
-    ofEnableLighting();
-    if (bPointLight) pointLight.enable();
-    if (bSpotLight) spotLight.enable();
-    if (bDirLight) directionalLight.enable();
-    
-    ofSetColor(255);
-    if (isPhongShaderOn) {
-        phongShader.begin();
-        phongShader.setUniform1i("numLights", 1);
-    }
-    
-    material.begin();
-    sphere.pan(.1);
-    icoSphere.pan(.1);
-    
-    if (ofGetKeyPressed('w')) {
-        if (isIcoSphere) icoSphere.draw(OF_MESH_WIREFRAME);
-        else sphere.draw(OF_MESH_WIREFRAME);
-    }
-    else {
-        if (isIcoSphere) icoSphere.draw();
-        else sphere.draw();
-    }
-    material.end();
-    if (isPhongShaderOn) phongShader.end();
-    
-    // lights / DOF
-    if (!bPointLight) pointLight.disable();
-    if (!bSpotLight) spotLight.disable();
-    if (!bDirLight) directionalLight.disable();
-    ofDisableLighting();
-    
-    // normals debug
-    auto mesh = sphere.getMeshPtr();
-    if(ofGetKeyPressed('n')){
-        vector<ofVec3f> n = mesh->getNormals();
-        vector<ofVec3f> v = mesh->getVertices();
-        float normalLength = 3;
-        
-        for(int i=0; i < n.size() ;i++){
-            int rowEnd = (UV_SPHERE_RES*2) + 1;
-            if (i % rowEnd == 0) ofSetColor(255, 255, 0);
-            else if ( (i+1) % rowEnd == 0 ) ofSetColor(0, 255, 255);
-            else ofSetColor(255);
-            //ofDrawBitmapString(ofToString(i), v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
-            ofDrawLine(v[i].x, v[i].y, v[i].z,
-                   v[i].x+n[i].x*normalLength, v[i].y+n[i].y*normalLength ,v[i].z+n[i].z*normalLength);
-        }
-    }
-    
-    cam.end();
-    
-    if (isDofEnabled) {
-        depthOfField.end();
-        if(ofGetKeyPressed('d')){
-            depthOfField.drawFocusAssist(0, 0);
-        }
-        else{
-            depthOfField.getFbo().draw(0, 0);
-        }
-    }
-    
-    ofDisableDepthTest();
-    ofSetColor(255);
-    if (isGuiVisible) gui.draw();
-}
-
 
 // This works for OF_PRIMITIVE_TRIANGLE_STRIP
 // based on discussions here:
@@ -331,13 +328,11 @@ void ofApp::updateNormals(ofMesh* mesh) {
     delete [] normal_buffer;
 }
 
-bool ofApp::checkSphereSafeIndex(int i) {
-    int rowEnd = (UV_SPHERE_RES*2) + 1;
-    return (i % rowEnd != 0);
-}
 
+//
 // This works for OF_PRIMITIVE_TRIANGLES
 // from https://gist.github.com/patriciogonzalezvivo/5473484
+//
 void ofApp::setNormals( ofMesh &mesh ){
     
     //The number of the vertices
@@ -382,6 +377,12 @@ void ofApp::setNormals( ofMesh &mesh ){
     mesh.addNormals( norm );
 }
 
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// 3D Helpers
+//////////////////////////////////////////////////////////////////////////////////
+
 void ofApp::createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsigned int sectors)
 {
     ofPrimitiveMode p;
@@ -414,10 +415,10 @@ void ofApp::createSphere(ofVboMesh *vbo, float radius, unsigned int rings, unsig
     }  
 }
 
-void ofApp::createGeoSphere(int stacks, int slices) {
+void ofApp::createGeoSphere(ofVboMesh *vbo, int stacks, int slices) {
     
     //add vertices
-    vbo.addVertex(ofVec3f(0,0,1));
+    vbo->addVertex(ofVec3f(0,0,1));
     
     for (int i=1; i<stacks; i++) {
         double phi = PI * double(i)/stacks;
@@ -425,16 +426,16 @@ void ofApp::createGeoSphere(int stacks, int slices) {
         double sinPhi = sin(phi);
         for (int j=0; j<slices; j++) {
             double theta = TWO_PI * double(j)/slices;
-            vbo.addVertex(ofVec3f(cos(theta)*sinPhi, sin(theta)*sinPhi, cosPhi));
+            vbo->addVertex(ofVec3f(cos(theta)*sinPhi, sin(theta)*sinPhi, cosPhi));
         }
     }
-    vbo.addVertex(ofVec3f(0,0,-1));
+    vbo->addVertex(ofVec3f(0,0,-1));
     
     //top row triangle fan
     for (int j=1; j<slices; j++) {
-        vbo.addTriangle(0,j,j+1);
+        vbo->addTriangle(0,j,j+1);
     }
-    vbo.addTriangle(0,slices,1);
+    vbo->addTriangle(0,slices,1);
     
     //triangle strips
     for (int i=0; i < stacks-2; i++) {
@@ -442,24 +443,29 @@ void ofApp::createGeoSphere(int stacks, int slices) {
         int bottom = (i+1)*slices + 1;
         
         for (int j=0; j<slices-1; j++) {
-            vbo.addTriangle(bottom+j, bottom+j+1, top+j+1);
-            vbo.addTriangle(bottom+j, top+j+1, top+j);
+            vbo->addTriangle(bottom+j, bottom+j+1, top+j+1);
+            vbo->addTriangle(bottom+j, top+j+1, top+j);
         }
         
-        vbo.addTriangle(bottom+slices-1, bottom, top);
-        vbo.addTriangle(bottom+slices-1, top, top+slices-1);
+        vbo->addTriangle(bottom+slices-1, bottom, top);
+        vbo->addTriangle(bottom+slices-1, top, top+slices-1);
     }
     
     //bottom row triangle fan
-    int last = vbo.getNumVertices()-1;
+    int last = vbo->getNumVertices()-1;
     for (int j=last-1; j>last-slices; j--) {
-        vbo.addTriangle(last,j,j-1);
+        vbo->addTriangle(last,j,j-1);
     }
-    vbo.addTriangle(last,last-slices,last-1);
+    vbo->addTriangle(last,last-slices,last-1);
     
 }
 
-//--------------------------------------------------------------
+
+
+//////////////////////////////////////////////////////////////////////////////////
+// oF Listeners
+//////////////////////////////////////////////////////////////////////////////////
+
 void ofApp::keyPressed(int key){
     switch (key) {
         case ' ':
@@ -468,26 +474,9 @@ void ofApp::keyPressed(int key){
         case 'f':
             ofToggleFullscreen();
             break;
-        case '1':
-            bPointLight = !bPointLight;
-            break;
-        case '2':
-            bSpotLight = !bSpotLight;
-            break;
-        case '3':
-            bDirLight = !bDirLight;
-            break;
-        case 's':
-            bShiny	= !bShiny;
-            if (bShiny) material.setShininess( 120 );
-            else material.setShininess( 30 );
-            break;
         case 'x':
             bSmoothLighting = !bSmoothLighting;
             ofSetSmoothLighting(bSmoothLighting);
-            break;
-        case 't':
-            bUseTexture = !bUseTexture;
             break;
         case OF_KEY_UP:
             // setSpotlightCutOff is clamped between 0 - 90 degrees //
@@ -512,52 +501,52 @@ void ofApp::keyPressed(int key){
     }
 }
 
-//--------------------------------------------------------------
+
 void ofApp::keyReleased(int key){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mouseMoved(int x, int y ){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mouseDragged(int x, int y, int button){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mousePressed(int x, int y, int button){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mouseReleased(int x, int y, int button){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mouseEntered(int x, int y){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::mouseExited(int x, int y){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::windowResized(int w, int h){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::gotMessage(ofMessage msg){
 
 }
 
-//--------------------------------------------------------------
+
 void ofApp::dragEvent(ofDragInfo dragInfo){ 
 
 }
