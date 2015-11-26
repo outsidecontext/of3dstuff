@@ -35,11 +35,8 @@ public:
     
     ofSpherePrimitive sphereBase;
     ofSpherePrimitive sphere;
-    
-    // ofCylinderPrimitive cylinderBase;
-    // ofCylinderPrimitive cylinder;
-    ofIcoSpherePrimitive cylinderBase;
-    ofIcoSpherePrimitive cylinder;
+    ofIcoSpherePrimitive icoSphereBase;
+    ofIcoSpherePrimitive icoSphere;
     
     ofEasyCam cam;
     
@@ -57,21 +54,41 @@ public:
     bool bPointLight, bSpotLight, bDirLight;
     bool bUseTexture;
     
+    // GUI
     bool isGuiVisible;
     ofxPanel gui;
+    
     ofParameter<ofVec3f> noiseIn;
     ofParameter<float> noiseInDiv;
     ofParameter<float> noiseOutMult;
     ofParameter<bool> isNoiseFromNormal;
+    ofParameter<bool> isNoiseAnimated;
     ofParameter<int> noiseVertMod;
     ofParameterGroup noiseParams;
     
     // TODO: add light and material colours
     // TODO: add shadow (FBO trick)
-    ofParameter<ofColor> spotLightColour;
+    ofParameter<ofColor> globalAmbient;
+    ofParameter<ofVec3f> lightPosition;
+    ofParameter<ofColor> lightAmbient;
+    ofParameter<ofColor> lightDiffuse;
+    ofParameter<ofColor> lightSpecular;
+    ofParameterGroup lightParams;
     
-    ofParameter<bool> isCylinderActive;
+    ofParameter<ofColor> matDiffuse;
+    ofParameter<ofColor> matAmbient;
+    ofParameter<ofColor> matEmissive;
+    ofParameter<ofColor> matSpecular;
+    ofParameter<float> matShiny;
+    ofParameterGroup matParams;
+    
+    ofParameter<ofColor> bgColourIn;
+    ofParameter<ofColor> bgColourOut;
+    ofParameterGroup bgParams;
+    
+    ofParameter<bool> isIcoSphere;
     ofParameter<bool> isPhongShaderOn;
+    ofParameterGroup sphereParams;
     
     ofParameter<bool> isDofEnabled;
     ofParameter<float> focalDistance;

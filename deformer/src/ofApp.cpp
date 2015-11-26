@@ -17,17 +17,14 @@ void ofApp::setup(){
     
     phongShader.load("Shaders/Phong/Phong.vert", "Shaders/Phong/Phong.frag");
     
-    // cylinder
-    //cylinder.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-    //cylinderBase.set(30, 80, 80, 80, 20, false, OF_PRIMITIVE_TRIANGLE_STRIP);
-    // or icosphere
-    cylinder.set(30, 6);
-    cylinderBase.set(30, 6);
+    // icosphere
+    icoSphere.set(30, 6);
+    icoSphereBase.set(30, 6);
 
     
-    pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
-    pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
-    pointLight.setPointLight();
+    //pointLight.setDiffuseColor( ofColor(0.f, 255.f, 0.f));
+    //pointLight.setSpecularColor( ofColor(255.f, 255.f, 0.f));
+    //pointLight.setPointLight();
     
     spotLight.setDiffuseColor( ofColor(250.f, 250.f, 250.f));
     spotLight.setSpecularColor( ofColor(255.f, 255.f, 255.f));
@@ -47,7 +44,7 @@ void ofApp::setup(){
     material.setShininess( 30 );
     material.setSpecularColor(ofColor(255, 255, 255, 255));
     
-    bDirLight = true;
+    bDirLight = false;
     bSpotLight = true;
     bPointLight = false;
     
@@ -59,7 +56,8 @@ void ofApp::setup(){
     isGuiVisible = true;
     gui.setup();
     
-    noiseParams.setName("settings");
+    noiseParams.setName("noise");
+    noiseParams.add(isNoiseAnimated.set("animated", false));
     noiseParams.add(noiseIn.set("input", ofVec3f(0), ofVec3f(-100), ofVec3f(100)));
     noiseParams.add(noiseInDiv.set("divide in", 500, 1, 1000));
     noiseParams.add(noiseOutMult.set("mult out", 10, 1, 100));
@@ -67,35 +65,71 @@ void ofApp::setup(){
     noiseParams.add(noiseVertMod.set("vert mod", 30, 1, 241));
     gui.add(noiseParams);
     
+    dofParams.setName("DOF");
     dofParams.add(isDofEnabled.set("enabled", false));
     dofParams.add(focalDistance.set("focal distance", 23, 0, 150));
     dofParams.add(focalRange.set("focal range", 4, 0, 10));
     dofParams.add(blurAmount.set("blur amount", 0.7, 0, 3));
     gui.add(dofParams);
     
-    gui.add(isPhongShaderOn.set("phong shader", false));
-    gui.add(isCylinderActive.set("cyclinder", false));
+    sphereParams.setName("Sphere");
+    sphereParams.add(isPhongShaderOn.set("phong shader", true));
+    sphereParams.add(isIcoSphere.set("ico sphere", false));
+    gui.add(sphereParams);
+    
+    lightParams.setName("Light");
+    lightParams.add( globalAmbient.set("Global Ambient", ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    //lightParams.add( lightPosition.set("Light Position",   ofVec3f( 60, 60, 200 ), ofVec3f( -200, -200, -200), ofVec3f( 200, 200, 200)) );
+    lightParams.add( lightDiffuse.set("Light Diffuse",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    lightParams.add( lightAmbient.set("Light Ambient",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    lightParams.add( lightSpecular.set("Light Specular", ofColor(255,255,255), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    gui.add(lightParams);
+    
+    matParams.setName("Mat");
+    matParams.add( matDiffuse.set("Mat Diffuse",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    matParams.add( matAmbient.set("Mat Ambient",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    matParams.add( matEmissive.set("Mat Ambient", ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    matParams.add( matSpecular.set("Mat Specular", ofColor(255,255,255), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    matParams.add( matShiny.set("Mat Shiny", 30, 1, 128));
+    gui.add(matParams);
+    
+    bgParams.setName("BG");
+    bgParams.add( bgColourIn.set("Colour In",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    bgParams.add( bgColourOut.set("Colour Out",   ofColor(50,50,50), ofColor(0,0,0,0), ofColor(255,255,255,255)) );
+    gui.add(bgParams);
+    
+    gui.minimizeAll();
     gui.loadFromFile("settings.xml");
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    pointLight.setPosition(cos(ofGetElapsedTimef()*.6f) * 60,
-                           sin(ofGetElapsedTimef()*.8f) * 60,
-                           -cos(ofGetElapsedTimef()*.8f) * 60);
+    //pointLight.setPosition(cos(ofGetElapsedTimef()*.6f) * 60, sin(ofGetElapsedTimef()*.8f) * 60, -cos(ofGetElapsedTimef()*.8f) * 60);
     spotLight.setPosition( 60, 60, 200);
     spotLight.lookAt(ofVec3f(30, 0, -50));
+    
+    // update light from GUI
+    ofSetGlobalAmbientColor( globalAmbient.get() );
+    //pointLight.setGlobalPosition( lightPosition.get() );
+    spotLight.setAmbientColor( lightAmbient.get() );
+    spotLight.setDiffuseColor( lightDiffuse.get() );
+    spotLight.setSpecularColor( lightSpecular.get() );
+    
+    // Material from GUI
+    //material.setColors(matDiffuse.get(), matAmbient.get(), matEmissive.get(), matSpecular.get());
+    material.setShininess(matShiny.get());
     
     auto mesh = sphereBase.getMeshPtr();
     auto MeshOut = sphere.getMeshPtr();
     updateMesh(mesh, MeshOut);
-    if (isCylinderActive) {
-        mesh = cylinderBase.getMeshPtr();
-        MeshOut = cylinder.getMeshPtr();
+    
+    if (isIcoSphere) {
+        mesh = icoSphereBase.getMeshPtr();
+        MeshOut = icoSphere.getMeshPtr();
         updateMesh(mesh, MeshOut);
     }
-    if (ofGetKeyPressed('r')) {
-        if (isCylinderActive) setNormals(*MeshOut);
+    if (!ofGetKeyPressed('r')) {
+        if (isIcoSphere) setNormals(*MeshOut);
         else updateNormals(MeshOut);
     }
     
@@ -103,6 +137,16 @@ void ofApp::update(){
     depthOfField.setBlurAmount(blurAmount);
     depthOfField.setFocalDistance(focalDistance);
     depthOfField.setFocalRange(focalRange);
+    
+    if (isNoiseAnimated) {
+        float time = ofGetElapsedTimef();
+        ofVec3f noiseAnim(
+                          (ofNoise(time/2)-0.5) * 80,
+                          (ofNoise(time/3)-0.5) * 80,
+                          (ofNoise(time/4)-0.5) * 80);
+        noiseIn.set(noiseAnim);
+        //spotLight.setDiffuseColor( ofColor(ofNoise(ofGetElapsedTimef()/2)*255, ofNoise(ofGetElapsedTimef()/3)*255, ofNoise(ofGetElapsedTimef()/4)*255) );
+    }
     
 }
 
@@ -116,8 +160,8 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
             // use normals
             noiseVert = MeshOut->getNormal(i) / noiseInDiv;
             // Sydney Opera House
-            //float scalar = i % noiseVertMod;
-            //noiseVert = ofVec3f(scalar, scalar, scalar) * noiseInDiv;
+            float scalar = i % noiseVertMod;
+            noiseVert = ofVec3f(scalar, scalar, scalar) * noiseInDiv;
         }
         // simplex noise creates uneven shapes
         float noise = ofNoise(noiseVert.z*noiseIn.get().z, noiseVert.x*noiseIn.get().x, noiseVert.y*noiseIn.get().y) -0.5;
@@ -125,7 +169,7 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
         //noise = sin(noiseVert.z*noiseIn.get().x) * sin(noiseVert.x*noiseIn.get().y) * sin(noiseVert.y*noiseIn.get().z);
         // cos multiplier gives more even lumps
         //noise = cos(noiseVert.z*noiseIn.get().x) * cos(noiseVert.x*noiseIn.get().y) * cos(noiseVert.y*noiseIn.get().z);
-        
+        // threshold for square shapes
         //if (noise > 0.2) noise = 0.5;
         //if (noise < -0.2) noise = -0.5;
         
@@ -143,9 +187,8 @@ void ofApp::updateMesh(ofMesh* mesh, ofMesh* MeshOut) {
 //--------------------------------------------------------------
 void ofApp::draw(){
     
-    
     if (isDofEnabled) depthOfField.begin();
-    ofBackgroundGradient(ofColor(255), ofColor(100));
+    ofBackgroundGradient(bgColourIn.get(), bgColourOut.get());
     ofEnableDepthTest();
     cam.begin();
     
@@ -163,16 +206,14 @@ void ofApp::draw(){
     
     material.begin();
     sphere.pan(.1);
-    cylinder.pan(.1);
+    icoSphere.pan(.1);
     
     if (ofGetKeyPressed('w')) {
-        if (isCylinderActive) cylinder.draw(OF_MESH_WIREFRAME);
+        if (isIcoSphere) icoSphere.draw(OF_MESH_WIREFRAME);
         else sphere.draw(OF_MESH_WIREFRAME);
     }
     else {
-        if (isCylinderActive) {
-            cylinder.draw();
-        }
+        if (isIcoSphere) icoSphere.draw();
         else sphere.draw();
     }
     material.end();
