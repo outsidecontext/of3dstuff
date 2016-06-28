@@ -362,6 +362,200 @@
 				<key>sourceTree</key>
 				<string>SOURCE_ROOT</string>
 			</dict>
+			<key>DAA70A50F276525E63A25DC6</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>fft.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/libs/fft.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>1B64B7957A22C4BDA1592DD4</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>39467E552EF13540BB002F9E</string>
+					<string>DAA70A50F276525E63A25DC6</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>libs</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>39836E76C1045ECC8CD71511</key>
+			<dict>
+				<key>fileRef</key>
+				<string>39467E552EF13540BB002F9E</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>39467E552EF13540BB002F9E</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>fft.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/libs/fft.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>E46178EF30865CB0CE4D372D</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTLive.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTLive.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>D75776B1465EF369BB2B19CD</key>
+			<dict>
+				<key>fileRef</key>
+				<string>803F1723C773514ECB0B2603</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>803F1723C773514ECB0B2603</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTLive.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTLive.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>35EF1E1D1CB35BF257AC18FC</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTFile.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTFile.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>34B0EA6FA9243CC336D4713A</key>
+			<dict>
+				<key>fileRef</key>
+				<string>2C02A0B9E263EF399108390C</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>2C02A0B9E263EF399108390C</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTFile.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTFile.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>FD58BD542BF2786A904B7AC9</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.c.h</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTBase.h</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTBase.h</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
+			<key>0A2E5BCC3F86CB447BAEAEB2</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>B8722F32B945F2D45559A533</string>
+					<string>FD58BD542BF2786A904B7AC9</string>
+					<string>2C02A0B9E263EF399108390C</string>
+					<string>35EF1E1D1CB35BF257AC18FC</string>
+					<string>803F1723C773514ECB0B2603</string>
+					<string>E46178EF30865CB0CE4D372D</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>src</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>38D6D30992FE734203F60492</key>
+			<dict>
+				<key>children</key>
+				<array>
+					<string>0A2E5BCC3F86CB447BAEAEB2</string>
+					<string>1B64B7957A22C4BDA1592DD4</string>
+				</array>
+				<key>isa</key>
+				<string>PBXGroup</string>
+				<key>name</key>
+				<string>ofxFFT</string>
+				<key>sourceTree</key>
+				<string>&lt;group&gt;</string>
+			</dict>
+			<key>1711FD836260FE025DDDF8C9</key>
+			<dict>
+				<key>fileRef</key>
+				<string>B8722F32B945F2D45559A533</string>
+				<key>isa</key>
+				<string>PBXBuildFile</string>
+			</dict>
+			<key>B8722F32B945F2D45559A533</key>
+			<dict>
+				<key>explicitFileType</key>
+				<string>sourcecode.cpp.cpp</string>
+				<key>fileEncoding</key>
+				<string>30</string>
+				<key>isa</key>
+				<string>PBXFileReference</string>
+				<key>name</key>
+				<string>ofxFFTBase.cpp</string>
+				<key>path</key>
+				<string>../../../addons/ofxFFT/src/ofxFFTBase.cpp</string>
+				<key>sourceTree</key>
+				<string>SOURCE_ROOT</string>
+			</dict>
 			<key>241A8C966DB5CC471192A220</key>
 			<dict>
 				<key>explicitFileType</key>
@@ -1270,6 +1464,7 @@
 				<array>
 					<string>2C8F245ACBE61E28646C17F2</string>
 					<string>B922E169D182E0584C76B14A</string>
+					<string>38D6D30992FE734203F60492</string>
 					<string>480A780D8D0308AE4A368801</string>
 				</array>
 				<key>isa</key>
@@ -1452,6 +1647,8 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
 						<string>../../../addons/ofxDOF/src</string>
+						<string>../../../addons/ofxFFT/libs</string>
+						<string>../../../addons/ofxFFT/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1527,6 +1724,8 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
 						<string>../../../addons/ofxDOF/src</string>
+						<string>../../../addons/ofxFFT/libs</string>
+						<string>../../../addons/ofxFFT/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>CONFIGURATION_BUILD_DIR</key>
@@ -1589,6 +1788,10 @@
 					<string>8DED5056525646FA71980866</string>
 					<string>B8846EF8E504895A4A9EFEC0</string>
 					<string>1FB13B2C1658CA138B0E96F6</string>
+					<string>1711FD836260FE025DDDF8C9</string>
+					<string>34B0EA6FA9243CC336D4713A</string>
+					<string>D75776B1465EF369BB2B19CD</string>
+					<string>39836E76C1045ECC8CD71511</string>
 					<string>856AA354D08AB4B323081444</string>
 					<string>5CBB2AB3A60F65431D7B555D</string>
 					<string>B266578FC55D23BFEBC042E7</string>
@@ -1697,6 +1900,8 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
 						<string>../../../addons/ofxDOF/src</string>
+						<string>../../../addons/ofxFFT/libs</string>
+						<string>../../../addons/ofxFFT/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>
@@ -1762,6 +1967,8 @@
 						<string>../../../addons/ofxAssimpModelLoader/libs/assimp/license</string>
 						<string>../../../addons/ofxAssimpModelLoader/src</string>
 						<string>../../../addons/ofxDOF/src</string>
+						<string>../../../addons/ofxFFT/libs</string>
+						<string>../../../addons/ofxFFT/src</string>
 						<string>../../../addons/ofxGui/src</string>
 					</array>
 					<key>COMBINE_HIDPI_IMAGES</key>

@@ -12,3 +12,4 @@ fi
 
 ${PREFIX}patriciogonzalezvivo/ofxTuio
 ${PREFIX}obviousjim/ofxDOF
+${PREFIX}julapy/ofxFFT

@@ -1,3 +1,4 @@
 ofxAssimpModelLoader
 ofxDOF
+ofxFFT
 ofxGui

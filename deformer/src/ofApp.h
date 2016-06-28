@@ -3,6 +3,8 @@
 #include "ofMain.h"
 #include "ofxGui.h"
 #include "ofxDOF.h"
+#include "ofxFFTLive.h"
+#include "ofxFFTFile.h"
 
 class ofApp : public ofBaseApp{
     
@@ -44,6 +46,17 @@ public:
     ofLight spotLight;
     ofMaterial material;
     bool bSmoothLighting;
+    
+    
+    //////////////////////////////////////////////////////////////////////////////////
+    // FFT
+    //////////////////////////////////////////////////////////////////////////////////
+    ofxFFTLive fftLive;
+    ofxFFTFile fftFile;
+    vector<float> levels;
+    int numLevels;
+    bool audioMirror;
+    
     
     //////////////////////////////////////////////////////////////////////////////////
     // GUI

@@ -38,6 +38,14 @@ void ofApp::setup(){
     material.setSpecularColor(ofColor(255, 255, 255, 255));
     ofDisableArbTex();
     
+    // FFT
+    audioMirror = false;
+    fftLive.setMirrorData(audioMirror);
+    fftLive.setup();
+    fftLive.soundStream->start();
+    numLevels = 4;
+    levels.assign(numLevels, 0.0);
+    
     // GUI
     isGuiVisible = true;
     gui.setup();
@@ -59,7 +67,7 @@ void ofApp::setup(){
     gui.add(dofParams);
     
     sphereParams.setName("Sphere");
-    sphereParams.add(isPhongShaderOn.set("phong shader", true));
+    sphereParams.add(isPhongShaderOn.set("phong shader", false));
     sphereParams.add(isToonShaderOn.set("toon shader", true));
     sphereParams.add(isIcoSphere.set("ico sphere", false));
     gui.add(sphereParams);
@@ -125,14 +133,31 @@ void ofApp::update(){
     depthOfField.setFocalDistance(focalDistance);
     depthOfField.setFocalRange(focalRange);
     
+    
+    // FFT
+    fftLive.update();
+    int n  = levels.size();
+    float * audioData = new float[n];
+    fftLive.getFftPeakData(audioData, n);
+    for(int i=0; i<levels.size(); i++) {
+        float audioValue = audioData[i];
+        levels[i] = audioValue;
+    }
+    delete[] audioData;
+    
     // animate noise
     if (isNoiseAnimated) {
+        
+        
         float time = ofGetElapsedTimef();
         ofVec3f noiseAnim(
                           (ofNoise(time/2)-0.5) * 80,
                           (ofNoise(time/3)-0.5) * 80,
                           (ofNoise(time/4)-0.5) * 80);
         noiseIn.set(noiseAnim);
+        
+        //if (levels.size() > 0) noiseIn.set(ofVec3f(levels[0] * 20, levels[1] * 20, levels[2] * 20));
+        
         //spotLight.setDiffuseColor( ofColor(ofNoise(ofGetElapsedTimef()/2)*255, ofNoise(ofGetElapsedTimef()/3)*255, ofNoise(ofGetElapsedTimef()/4)*255) );
     }
     
@@ -470,9 +495,23 @@ void ofApp::keyPressed(int key){
     switch (key) {
         case ' ':
             isGuiVisible = !isGuiVisible;
+            if (isGuiVisible) ofShowCursor();
+            else ofHideCursor();
+            break;
+        case 'a':
+            isNoiseAnimated = !isNoiseAnimated;
             break;
         case 'f':
             ofToggleFullscreen();
+            break;
+        case 'i':
+            isIcoSphere = !isIcoSphere;
+            break;
+        case 'p':
+            isPhongShaderOn = !isPhongShaderOn;
+            break;
+        case 't':
+            isToonShaderOn = !isToonShaderOn;
             break;
         case 'x':
             bSmoothLighting = !bSmoothLighting;
